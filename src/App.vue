@@ -87,11 +87,9 @@
     <nav>
       <!-- Logo a la izquierda -->
       <router-link to="/" class="logo-container">
-        <!-- <img alt="Logo" class="logo" src="./assets/home/logo-negro.png"> -->
-
         <picture>
-          <source media="(max-width: 1000px)" srcset="./assets/home/isotipo-blanco.png">
-          <img alt="Logo" class="logo" src="./assets/home/logo-negro.png">
+          <source media="(max-width: 1000px)" srcset="/assets/isotipo-blanco.png">
+          <img alt="Logo" class="logo" src="/assets/logo-blanco.png">
         </picture>
       </router-link>
 

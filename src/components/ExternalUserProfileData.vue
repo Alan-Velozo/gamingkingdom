@@ -1,43 +1,43 @@
 <script>
-import TextWithDefault from './TextWithDefault.vue';
-import { getUserCommunities } from '../services/community';
+    import TextWithDefault from './TextWithDefault.vue';
+    import { getUserCommunities } from '../services/community';
 
 
-export default {
-    name: 'ExternalUserProfileData',
-    components: { TextWithDefault },
-    props: {
-        user: {
-            type: Object,
-            required: true,
-            loadingCommunities: true,
-        }
-    },
-    data(){
-        return{
-            communities: [],
-            loadingCommunities: true,
-        }
-    },
-    async mounted() {
-        if (this.user.id) {
-            this.loadingCommunities = true;
-            try {
-                // Obtener las comunidades del usuario
-                this.communities = await getUserCommunities(this.user.id);
-            } catch (error) {
-                console.error("Error al cargar las comunidades:", error);
+    export default {
+        name: 'ExternalUserProfileData',
+        components: { TextWithDefault },
+        props: {
+            user: {
+                type: Object,
+                required: true,
+                loadingCommunities: true,
             }
-            this.loadingCommunities = false;
+        },
+        data(){
+            return{
+                communities: [],
+                loadingCommunities: true,
+            }
+        },
+        async mounted() {
+            if (this.user.id) {
+                this.loadingCommunities = true;
+                try {
+                    // Obtener las comunidades del usuario
+                    this.communities = await getUserCommunities(this.user.id);
+                } catch (error) {
+                    console.error("Error al cargar las comunidades:", error);
+                }
+                this.loadingCommunities = false;
+            }
         }
     }
-}
 </script>
 
 <template>
     <div>
         <div class="banner" v-if="user.bannerURL" :style="{ backgroundImage: `url(${user.bannerURL})`}"></div>
-        <div class="banner" v-else="user.bannerURL" style="background-image: url('../assets/profile/banner.webp');"></div>
+        <div class="banner" v-else="user.bannerURL" style="background-image: url('/assets/users/banner.webp');"></div>
         
         <div class="user">
             <div class="user-img-container">

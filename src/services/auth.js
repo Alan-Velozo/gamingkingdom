@@ -4,8 +4,8 @@ import { createUserProfile, getUserProfileById, updateUserProfile } from "./user
 import { getFileURL, uploadFile } from "./file-storage";
 import { getExtensionFromFile } from "../libraries/file";
 
-import defaultProfileImage from "../assets/profile/user.png";
-import defaultBannerImage from "../assets/profile/banner.webp";
+import defaultProfileImage from "/assets/users/user.png";
+import defaultBannerImage from "/assets/users/banner.webp";
 
 
 // Objeto que representa los datos vacíos de un usuario

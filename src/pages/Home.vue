@@ -221,7 +221,7 @@
                     </div>
 
                     <div class="banner-2">
-                        <img alt="Isologotipo de GamingKingdom" src="../../../public/isotipo.svg" class="banner-img">
+                        <img alt="Isologotipo de GamingKingdom" src="/assets/isotipo.svg" class="banner-img">
                     </div>
                 </div>
             </div>
@@ -234,8 +234,8 @@
                             <p>En GamingKingdom, somos una comunidad apasionada de jugadores que va más allá de solo disfrutar de los videojuegos. Creado por un chico normal al que le gustaba jugar, este foro es un espacio dedicado a conectar a jugadores de todo el mundo, promoviendo la interacción, el aprendizaje y el intercambio de experiencias. Creemos en el poder de los videojuegos para unir a las personas, y nuestro objetivo es crear un entorno inclusivo y acogedor donde todos los jugadores, desde principiantes hasta expertos, puedan sentirse en casa.</p>
                         </div>
                         <div class="image">
-                            <img alt="Jefe Maestro" src="../assets/home/home-1.jpg">
-                            <img alt="Orco de la Horda y soldado de la Alianza luchando" src="../assets/home/home-3.jpg">
+                            <img alt="Jefe Maestro" src="/assets/home/home-1.jpg">
+                            <img alt="Orco de la Horda y soldado de la Alianza luchando" src="/assets/home/home-3.jpg">
                         </div>
                     </div>
                     
@@ -245,8 +245,8 @@
 
                         </div>
                         <div class="image">
-                            <img alt="Ser de Ceniza avivando una hoguera" src="../assets/home/home-2.jpg">
-                            <img alt="Link escalando una montaña" src="../assets/home/home-4.jpg">
+                            <img alt="Ser de Ceniza avivando una hoguera" src="/assets/home/home-2.jpg">
+                            <img alt="Link escalando una montaña" src="/assets/home/home-4.jpg">
                         </div>
                     </div>
                 </div>
@@ -259,7 +259,7 @@
                             <h2>Conectate con jugadores alrededor del mundo</h2>
                         </div>
                         <div class="section-2-image">
-                            <img src="../assets/home/mapa.png" alt="Ilustración de jugadores conectados alrededor del mundo">
+                            <img src="/assets/home/mapa.png" alt="Ilustración de jugadores conectados alrededor del mundo">
                         </div>
                     </div>
                 </div>

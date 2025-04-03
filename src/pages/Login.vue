@@ -71,7 +71,7 @@
                 </div>
 
                 <div class="login-content">
-                    <img src="../../../public/isotipo.svg" alt="Logo">
+                    <img src="/assets/isotipo.svg" alt="Logo">
                 </div>
             </div>
         </div>
