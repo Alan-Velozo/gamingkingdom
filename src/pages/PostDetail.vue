@@ -1,0 +1,509 @@
+<script>
+  import { subscribeToPosts, subscribeToComments, saveComment, getLikesAndDislikes, toggleReaction, toggleCommentReaction, toggleSavePost, getSavedPosts } from '../services/post'; // Funciones necesarias
+  import { subscribeToAuth } from '../services/auth'; // Para obtener el usuario autenticado
+  import { ref, onMounted, onBeforeUnmount } from 'vue'; // Reactividad y ciclos de vida
+  import Loader from "../components/Loader.vue";
+
+  import Quill from 'quill';
+  import 'quill/dist/quill.snow.css';
+
+  export default {
+    components: { Loader },
+    data() {
+      return {
+        post: null, // El post que se mostrará
+        comments: [], // Los comentarios del post
+        newComment: '', // Estado reactivo para el comentario
+        postId: this.$route.params.id, // Obtener el ID del post desde la ruta
+        authUser: null, // Datos del usuario autenticado
+        unsubscribeAuth: null, // Para limpiar suscripciones
+        commentEditor: null,
+        isImage: true,
+        isSaved: false,
+        loading: true,
+      };
+    },
+    methods: {
+      formatDate(date) {
+        return Intl.DateTimeFormat('es-AR', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }).format(date).replace(',', '');
+      },
+      fetchPost() {
+        subscribeToPosts((posts) => {
+          const foundPost = posts.find((post) => post.id === this.postId); // Buscar el post por ID
+          if (foundPost) {
+            this.post = foundPost;
+            this.loading = false;
+          }
+        });
+      },
+      fetchComments() {
+        subscribeToComments(this.postId, (comments) => {
+          this.comments = comments; // Actualizamos los comentarios
+          this.loading = false;
+        });
+      },
+      submitComment() {
+        // Eliminar etiquetas HTML y espacios en blanco
+        const strippedContent = this.newComment.replace(/<[^>]+>/g, '').trim();
+
+        // Validar si el comentario está vacío o solo contiene espacios
+        if (strippedContent === '') {
+          return;
+        }
+
+        const comment = {
+          user_id: this.authUser.id,
+          email: this.authUser.email,
+          displayName: this.authUser.displayName,
+          content: this.newComment, // Guardar el contenido con las etiquetas HTML
+          photoURL: this.authUser.photoURL, // URL del avatar del usuario
+        };
+
+        saveComment(this.postId, comment).then(() => {
+          // Limpiar el editor Quill
+          if (this.commentEditor) {
+            this.commentEditor.root.innerHTML = ''; // Limpiar el contenido del editor
+          }
+          this.newComment = ''; // Reiniciar la variable newComment
+        });
+      },
+
+      async toggleSave() {
+        try {
+          const isNowSaved = await toggleSavePost(this.authUser.id, this.postId);
+          this.isSaved = isNowSaved; // Actualiza el estado de guardado
+        } catch (error) {
+          console.error("Error al guardar/desguardar el post:", error);
+        }
+      },
+
+      async checkIfPostIsSaved() {
+        if (this.authUser && this.postId) {
+          try {
+            const savedPostIds = await getSavedPosts(this.authUser.id);
+            this.isSaved = savedPostIds.includes(this.postId); // Verifica si el post está guardado
+          } catch (error) {
+            console.error("Error al verificar si el post está guardado:", error);
+          }
+        }
+      },
+      async toggleLike() {
+        try {
+          await toggleReaction(this.postId, "like", this.authUser.id);
+          this.updatePost();
+        } catch (error) {
+          console.error("Error al dar like", error);
+        }
+      },
+      async toggleDislike() {
+        try {
+          await toggleReaction(this.postId, "dislike", this.authUser.id);
+          this.updatePost();
+        } catch (error) {
+          console.error("Error al dar dislike", error);
+        }
+      },
+      isLiked() {
+        return this.post && this.post.likes && this.post.likes.includes(this.authUser.id);
+      },
+      isDisliked() {
+        return this.post && this.post.dislikes && this.post.dislikes.includes(this.authUser.id);
+      },
+      async updatePost() {
+        // Actualiza solo los likes/dislikes del post
+        const updated = await getLikesAndDislikes(this.postId);
+        if (updated) {
+          this.post.likes = updated.likes;
+          this.post.dislikes = updated.dislikes;
+        }
+      },
+      async toggleCommentLike(comment) {
+        try {
+          await toggleCommentReaction(this.postId, comment.id, "like", this.authUser.id);
+        } catch (error) {
+          console.error("Error al dar like al comentario:", error);
+        }
+      },
+      async toggleCommentDislike(comment) {
+        try {
+          await toggleCommentReaction(this.postId, comment.id, "dislike", this.authUser.id);
+        } catch (error) {
+          console.error("Error al dar dislike al comentario:", error);
+        }
+      },
+      isCommentLiked(comment) {
+        return comment.likes && comment.likes.includes(this.authUser.id);
+      },
+      isCommentDisliked(comment) {
+        return comment.dislikes && comment.dislikes.includes(this.authUser.id);
+      },
+
+      onImageError() {
+        // Si ocurre un error al cargar la imagen, asumimos que no es una imagen y mostramos video
+        this.isImage = false;
+      }
+    },
+
+    computed: {
+      isCommentEmpty() {
+        const strippedContent = this.newComment.replace(/<[^>]+>/g, '').trim();
+        return strippedContent === '';
+      }
+    },
+    mounted() {
+      // Suscribir al usuario autenticado
+      this.unsubscribeAuth = subscribeToAuth((newUserData) => {
+        this.authUser = newUserData; // Actualizar los datos del usuario autenticado
+        this.checkIfPostIsSaved();
+      });
+
+      // Obtener post y comentarios
+      this.fetchPost();
+      this.fetchComments();
+
+      // Inicializar Quill para los comentarios
+      this.$nextTick(() => {
+        const commentContainer = this.$refs.commentEditor;
+        if (commentContainer) {
+          this.commentEditor = new Quill(commentContainer, {
+            theme: 'snow',
+            placeholder: 'Escribe un comentario...',
+            modules: {
+              toolbar: [
+                      ['bold', 'italic', 'underline', 'strike'],
+                      ['link'],
+                  ],
+              clipboard: {
+                // Opcional: eliminar formatos al pegar
+                matchVisual: false,
+              },
+            },
+          });
+          this.commentEditor.on('text-change', () => {
+            this.newComment = this.commentEditor.root.innerHTML;
+          });
+          // Agregar matcher para eliminar formatos al pegar (dejando solo texto)
+          this.commentEditor.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+            delta.ops = delta.ops.map(op => {
+              if (op.insert && typeof op.insert === 'string') {
+                return { insert: op.insert };
+              }
+              return op;
+            });
+            return delta;
+          });
+        } else {
+          console.error("El contenedor para el editor de comentarios no está disponible.");
+        }
+      });
+    },
+    beforeUnmount() {
+      // Limpiar las suscripciones para evitar fugas de memoria
+      if (this.unsubscribeAuth) this.unsubscribeAuth();
+    },
+  };
+</script>
+
+<template>
+
+
+
+  <div>
+    <div v-if="loading" class="min-h-[70vh] flex justify-center items-center">
+      <Loader />
+    </div>
+    <div v-else>
+      <!-- Mostrar el post -->
+      <div v-if="post" class="post">
+        <router-link :to="post.user_id === authUser.id ? '/perfil' : `/usuario/${post.user_id}`">
+          <div class="post-info">
+            <img :src="post.photoURL" alt="Post imagen" v-if="post.photoURL" />
+            <p class="post-username">{{ post.displayName }}</p>
+            <p v-if="post.created_at !== null" class="post-date">
+              {{ formatDate(post.created_at.toDate()) }}
+            </p>
+          </div>
+        </router-link>
+
+        <img v-if="isImage" :src="post.cover" class="m-auto pb-10" @error="onImageError"/>
+        <video v-else :src="post.cover" class="m-auto pb-10" controls></video>
+        
+        <div v-html="post.content" class="post-content"></div>
+
+        <div class="post-actions">
+          <button @click.prevent="toggleLike" :class="{ liked: isLiked() }">
+            <i class="fa-solid fa-up-long" style="color: #0d76bc;"></i> 
+            <!-- {{ post.likes ? post.likes.length : 0 }} -->
+            <span :style="{ color: isLiked() ? '#0d76bc' : 'black' }">
+              {{ post.likes ? post.likes.length : 0 }}
+            </span>
+          </button>
+          <button @click.prevent="toggleDislike" :class="{ disliked: isDisliked() }">
+            <i class="fa-solid fa-down-long" style="color: #bf3138;"></i> 
+            <!-- {{ post.dislikes ? post.dislikes.length : 0 }} -->
+            <span :style="{ color: isDisliked() ? '#bf3138' : 'black' }">
+              {{ post.dislikes ? post.dislikes.length : 0 }}
+            </span>
+          </button>
+
+          <button class="comment-counter">
+            <i class="fa-regular fa-comment" style="color: #000000;"></i> {{ comments.length || 0 }}
+          </button>
+
+          <button 
+            v-if="post.user_id !== authUser.id" 
+            @click.prevent="toggleSave" 
+            :class="{ saved: isSaved }" 
+            id="save-btn">
+            <i :class="isSaved ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'"></i>
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+
+      <!-- Formulario para agregar un comentario -->
+    <div class="comment-input-container">
+      <!-- Contenedor para el editor de comentario -->
+      <div ref="commentEditor" class="quill-comment-editor"></div>
+      <button @click="submitComment" :disabled="isCommentEmpty" class="submit-comment-button">Comentar</button>
+    </div>
+
+
+
+
+
+
+
+    <!-- Mostrar los comentarios -->
+    <div v-if="comments.length" class="comments-section">
+      <ul>
+        <li v-for="comment in comments" :key="comment.id">
+          <div class="comment">
+            <router-link :to="comment.user_id === authUser.id ? '/perfil' : `/usuario/${comment.user_id}`">
+              <div class="comment-info">
+                  <img :src="comment.photoURL" alt="Comment foto" v-if="comment.photoURL" class="comment-photo" />
+                  <p class="comment-username">{{ comment.displayName }}</p>
+                  <p v-if="comment.created_at !== null" class="comment-date">
+                    {{ formatDate(comment.created_at.toDate()) }}
+                  </p>
+              </div>
+            </router-link>
+
+            <div v-html="comment.content" class="comment-content"></div>
+
+
+            <div class="comment-reactions">
+              <button @click.prevent="toggleCommentLike(comment)" :class="{ liked: isCommentLiked(comment) }">
+                <i class="fa-solid fa-up-long" style="color: #0d76bc;"></i> 
+                <!-- {{ comment.likes ? comment.likes.length : 0 }} -->
+                <span :style="{ color: isCommentLiked(comment) ? '#0d76bc' : 'black' }">
+                  {{ comment.likes ? comment.likes.length : 0 }}
+                </span>
+              </button>
+              <button @click.prevent="toggleCommentDislike(comment)" :class="{ disliked: isCommentDisliked(comment) }">
+                <i class="fa-solid fa-down-long" style="color: #bf3138;"></i> 
+                <!-- {{ comment.dislikes ? comment.dislikes.length : 0 }} -->
+                <span :style="{ color: isCommentDisliked(comment) ? '#bf3138' : 'black' }">
+                  {{ comment.dislikes ? comment.dislikes.length : 0 }}
+                </span>
+              </button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</template>
+
+
+  
+
+
+<style scoped>
+
+  .post{
+    padding-top: 5%;
+    max-width: 90%;
+    margin: auto;
+    word-break: break-word;
+    overflow: hidden;
+  }
+
+  .post img, .post video{
+    max-height: 80vh;
+    object-fit: contain;
+  }
+
+  ::v-deep .post-content img {
+    max-width: 600px;
+    margin: auto;
+  }
+
+  .post-actions{
+    border-top: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+    padding: 1rem 0;
+    margin-top: 50px;
+    font-weight: bold;
+    font-size: 1.25rem;
+    display: flex;
+  }
+
+  .comment-reactions{
+    padding: 2rem 0 0 0;
+    font-weight: bold;
+  }
+
+  .post-actions button i, .comment-reactions i{
+    padding-right: 5px;
+  }
+
+  .comment-reactions button:last-of-type{
+    padding-left: 3rem;
+  } 
+
+  .post-actions button:nth-child(2){
+    padding: 0 3rem;
+  }
+
+  #save-btn{
+    margin-left: auto !important;
+  }
+
+  .comment-input-container{
+    padding: 0 5%;
+    margin: 50px 0 50px 0;
+  }
+
+  .submit-comment-button{
+    background: #0d76bc;
+    color: white;
+    padding: 15px 50px;
+    margin-top: 20px;
+  }
+
+  .submit-comment-button:hover{
+    background: #0b67a5;
+    transition-property: background;
+    transition-duration: .5s;
+  }
+
+  .comment{
+    padding: 1%;
+    border-bottom: 1px solid black;
+    word-break: break-word;
+    overflow: hidden;
+  }
+
+  .post-info, .comment-info{
+    display: flex;
+    align-items: center;
+    padding-bottom: 3rem;
+  }
+
+  .comment-info{
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+  }
+
+  .post-info img, .comment-info img{
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    object-fit: cover;
+  }
+
+  .post-info .post-username, .comment-info .comment-username{
+    font-weight: bold;
+    padding-left: 2rem;
+    font-size: 1.5rem;
+  }
+
+  .comment-info .comment-username{
+    font-size: 1.25rem;
+  }
+
+  .quill-comment-editor{
+    min-height: 100px;
+  }
+
+  @media screen and (max-width: 700px) {
+    .post-info .post-username, .comment-info .comment-username{
+      font-size: 1rem;
+    }
+
+    .post-info .post-date, .comment-date{
+      margin-left: auto;
+      font-size: .5rem;
+    }
+  }
+
+  .post-info .post-date, .comment-date{
+    margin-left: auto;
+    font-size: 1.10rem;
+    font-weight: 300;
+  }
+
+  .post-content{
+    padding-bottom: 2.5rem;
+  }
+
+  .post-file{
+    margin: auto;
+    max-width: 100%;
+  }
+
+
+
+
+  .comments-section{
+      padding: 0 5%;
+    }
+
+
+
+
+
+    @media screen and (max-width: 1023px) {
+      
+      .post img, .post video{
+        height: fit-content;
+        width: 100%;
+      }
+
+      .post .post-info img{
+        height: 50px;
+        width: 50px;
+      }
+      
+    }
+
+
+
+  @media screen and (max-width: 700px) {
+    .post-info .post-username, .comment-info .comment-username{
+      font-size: 1rem;
+      padding-left: 1rem;
+    }
+
+    .post-info .post-date, .comment-date{
+      margin-left: auto;
+      font-size: 1rem;
+    }
+  }
+
+
+  
+
+</style>

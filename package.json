@@ -1,0 +1,27 @@
+{
+  "name": "proyecto-dv",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "autoprefixer": "^10.4.19",
+    "tailwindcss": "^3.4.3",
+    "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "@tiptap/core": "^2.11.5",
+    "@tiptap/starter-kit": "^2.11.5",
+    "@tiptap/vue-3": "^2.11.5",
+    "firebase": "^10.11.0",
+    "masonry-layout": "^4.2.2",
+    "quill": "^2.0.3",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  }
+}

@@ -1,0 +1,155 @@
+<script>
+  export default {
+    name: "PostItem",
+    props: {
+      post: {
+        type: Object,
+        required: true,
+      },
+      categoryStyles: {
+        type: Object,
+        required: true,
+      },
+      commentsCount: {
+        type: Number,
+        default: 0,
+      },
+      currentUserId: {
+        type: String,
+        required: true,
+      }
+    },
+    data() {
+      return {
+        isImage: true // Asumimos que es imagen por defecto
+      };
+    },
+    methods: {
+      goToPost() {
+        // Emitir evento para que el padre redireccione
+        this.$emit("go-to-post", this.post.id);
+      },
+      toggleLike() {
+        this.$emit("toggle-like", this.post.id);
+      },
+      toggleDislike() {
+        this.$emit("toggle-dislike", this.post.id);
+      },
+      formatDate(date) {
+        return new Intl.DateTimeFormat("es-AR", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(date).replace(",", "");
+      },
+      onImageError() {
+        this.isImage = false; // Si la imagen no carga, es un video
+      }
+    }
+  };
+</script>
+
+<template>
+  <div class="post-item">
+    <!-- Portada del post -->
+    <img v-if="isImage" :src="post.cover" class="post-cover" @error="onImageError" @click="goToPost"/>
+    <video v-else :src="post.cover" class="post-cover" controls></video>
+
+    <!-- Contenedor de la miniatura del post -->
+    <div class="post-thumbnail">
+      <!-- Información del post: categoría y fecha -->
+      <div class="post-info" @click="goToPost">
+        <span
+          v-if="post.category && categoryStyles[post.category.toLowerCase()]"
+          class="post-category"
+          :style="{ backgroundColor: categoryStyles[post.category.toLowerCase()].color }"
+        >
+          <i :class="['fa', categoryStyles[post.category.toLowerCase()].icon]"></i>
+          {{ post.category === 'Guia' ? 'Guía' : post.category }}
+        </span>
+        <span v-if="post.created_at" class="post-date">
+          {{ formatDate(post.created_at.toDate()) }}
+        </span>
+      </div>
+
+      <!-- Título del post -->
+      <p class="post-title" @click="goToPost">{{ post.title }}</p>
+
+      <!-- Acciones: like, dislike y comentarios -->
+      <div class="post-actions flex">
+        <button @click.prevent="toggleLike" :class="{ liked: post.likes && post.likes.includes(currentUserId) }">
+          <i class="fa-solid fa-up-long" style="color: #0d76bc;"></i> 
+          <!-- {{ post.likes ? post.likes.length : 0 }} -->
+          <span :style="{ color: post.likes && post.likes.includes(currentUserId) ? '#0d76bc' : 'black' }">
+            {{ post.likes ? post.likes.length : 0 }}
+          </span>
+        </button>
+        <button @click.prevent="toggleDislike" :class="{ disliked: post.dislikes && post.dislikes.includes(currentUserId) }">
+          <i class="fa-solid fa-down-long" style="color: #bf3138;"></i> 
+          <!-- {{ post.dislikes ? post.dislikes.length : 0 }} -->
+          <span :style="{ color: post.dislikes && post.dislikes.includes(currentUserId) ? '#bf3138' : 'black' }">
+            {{ post.dislikes ? post.dislikes.length : 0 }}
+          </span>
+        </button>
+        <button class="comment-counter ml-auto" @click="goToPost">
+          <i class="fa-regular fa-comment" style="color: #000000;"></i> {{ commentsCount }}
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+
+  .post-actions button:nth-child(2){
+      padding-left: 2rem;
+  }
+
+  .post-actions button i{
+      padding-right: 5px;
+    }
+
+  .post-thumbnail{
+      font-weight: bold;
+  }
+
+  .post-cover{
+      width: 100%;
+      object-fit: cover;
+  }
+
+  .post-thumbnail .post-info{
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+  }
+
+  .post-thumbnail .post-info .post-date{
+      font-weight: lighter;
+      color: #848687;
+  }
+
+  .post-thumbnail .post-info .post-category{
+      padding: 5px 20px;
+      color: white;
+  }
+
+  .post-thumbnail .post-info .post-category i{
+      padding-right: 10px;
+  }
+
+  .post-title, .post-actions{
+      padding: 0 1rem;
+  }
+
+  .post-title{
+      font-size: 1.25rem;
+      font-weight: 600;
+  }
+
+  .post-actions{
+      padding: 1.5rem 1rem 1rem 1rem;
+  }
+  
+</style>

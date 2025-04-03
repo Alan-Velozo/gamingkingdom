@@ -1,0 +1,584 @@
+cuenta1@gmail.com
+1234567
+
+
+
+
+
+
+
+<!-- <span v-if="post.category" 
+                class="post-category"
+                :style="{ backgroundColor: categoryStyles[post.category].color }">
+            <i :class="['fa', categoryStyles[post.category].icon]"></i>
+            {{ post.category }}
+          </span> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          <script>
+import { subscribeToAuth } from '../services/auth';
+import MainButton from '../components/MainButton.vue';
+import PostLoader from '../components/PostLoader.vue';
+import { savePost, subscribeToPosts, saveComment, subscribeToComments, getLikesAndDislikes, toggleReaction, categories, categoryStyles } from '../services/post';
+import { uploadFileToStorage } from '../services/storage';
+
+import Quill from 'quill';
+import 'quill/dist/quill.snow.css';
+
+
+export default {
+    name: 'Home',
+    components: { MainButton, PostLoader },
+    data() {
+        return {
+            authUser: {
+                id: null,
+                email: null,
+                photoURL: null,
+                displayName: null
+            },
+            loadingUser: true,
+            posts: [],
+            loadingPosts: true,
+            comments: {},
+            newCommentContent: {},
+            newPost: {
+                title: '',
+                content: '',
+                category: "general",
+                cover: ''
+            },
+            coverPreview: null,
+            // selectedFile: null,
+        };
+    },
+    computed: {
+    // Podemos exponer las categorías importadas
+        categoryList() {
+            return categories;
+        },
+
+        categoryStyles() {
+            return categoryStyles;
+        }
+    },
+    methods: {
+        // handleFileChange(event) {
+        //     this.selectedFile = event.target.files[0];
+        //     console.log("Archivo seleccionado: ", this.selectedFile);
+        // },
+        async createPost() {
+            try {
+                await savePost({
+                    user_id: this.authUser.id,
+                    email: this.authUser.email,
+                    content: this.newPost.content,
+                    photoURL: this.authUser.photoURL,
+                    displayName: this.authUser.displayName,
+                    communityId: null,
+                    category: this.newPost.category,
+                    title: this.newPost.title,
+                    cover: this.newPost.cover,
+                });
+                this.newPost.content = '';
+                this.newPost.title = "";
+                this.newPost.cover = "";
+                this.coverPreview = null;
+
+            } catch (error) {
+                console.error("Error al guardar el post: ", error);
+            }
+        },
+
+        handleCoverUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      // Sube la imagen a Storage y guarda la URL en newPost.cover
+      uploadFileToStorage(file, `posts/cover/${file.name}`)
+        .then(url => {
+          this.newPost.cover = url;
+          this.coverPreview = url;
+        })
+        .catch(error => {
+          console.error("Error al subir la portada:", error);
+        });
+    },
+
+
+        async toggleLike(postId) {
+      try {
+        await toggleReaction(postId, "like", this.authUser.id);
+        this.updatePost(postId);
+      } catch (error) {
+        console.error("Error al dar like", error);
+      }
+    },
+    async toggleDislike(postId) {
+      try {
+        await toggleReaction(postId, "dislike", this.authUser.id);
+        this.updatePost(postId);
+      } catch (error) {
+        console.error("Error al dar dislike", error);
+      }
+    },
+    isLiked(postId) {
+      const post = this.posts.find(p => p.id === postId);
+      return post && post.likes && post.likes.includes(this.authUser.id);
+    },
+    isDisliked(postId) {
+      const post = this.posts.find(p => p.id === postId);
+      return post && post.dislikes && post.dislikes.includes(this.authUser.id);
+    },
+        /*isImage(fileURL) {
+            return fileURL.match(/\.(jpeg|jpg|gif|png|svg)$/i) !== null;
+        },
+        isVideo(fileURL) {
+            return fileURL.match(/\.(mp4|webm|ogg)$/i);
+        },*/
+        /*getEmbedUrl(url) {
+            const videoId = url.split('v=')[1] ? url.split('v=')[1].split('&')[0] : '';
+            return `https://www.youtube.com/embed/${videoId}`; // Cambiar según la plataforma
+        },*/
+        createComment(postId) {
+            saveComment(postId, {
+                user_id: this.authUser.id,
+                email: this.authUser.email,
+                displayName: this.authUser.displayName,
+                content: this.newCommentContent[postId],
+                photoURL: this.authUser.photoURL,
+            }).then(doc => {
+                console.log("Comentario ID generado: " + doc.id);
+            });
+            this.newCommentContent[postId] = '';
+        },
+        subscribeToPostComments(postId) {
+            if (!this.comments[postId]) {
+                this.comments[postId] = [];
+            }
+            return subscribeToComments(postId, newComments => {
+                this.comments[postId] = newComments;
+            });
+        },
+        formatDate(date) {
+            return Intl.DateTimeFormat('es-AR', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+            }).format(date).replace(',', '');
+        },
+
+        goToPost(postId) {
+            this.$router.push(`/post/${postId}`);
+        },
+
+
+        async updatePost(postId) {
+            const postIndex = this.posts.findIndex(p => p.id === postId);
+            if (postIndex !== -1) {
+                // Solicita la actualización del post directamente
+                this.posts[postIndex] = await getLikesAndDislikes(postId);
+            }
+        }
+    },
+    mounted() {
+        this.unsubscribeFromAuth = subscribeToAuth(newUserData => {
+            this.authUser = newUserData;
+            this.loadingUser = false;
+        });
+
+        this.unsubscribeFromPosts = subscribeToPosts(newPosts => {
+            this.posts = newPosts.filter(post => !post.communityId); // Solo posts sin comunidad
+            this.loadingPosts = false;
+            newPosts.forEach(post => {
+                if (!this.comments[post.id]) {
+                    this.comments[post.id] = [];
+                }
+                this.subscribeToPostComments(post.id);
+            });
+        });
+
+
+
+        this.$nextTick(() => {
+    if (this.$refs.editor) {
+        this.editor = new Quill(this.$refs.editor, {
+            theme: 'snow',
+            placeholder: '¿En qué estás pensando?',
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, false] }],
+                    ['bold', 'italic', 'underline'],
+                    ['link', 'image', 'video'],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    ['clean']
+                ]
+            }
+        });
+
+        this.editor.on('text-change', () => {
+            this.newPost.content = this.editor.root.innerHTML; // Actualizar contenido
+        });
+    } else {
+        console.error("El contenedor de Quill no está disponible.");
+    }
+});
+
+    },
+    beforeUnmount() {
+        if (this.unsubscribeFromAuth) this.unsubscribeFromAuth();
+        if (this.unsubscribeFromPosts) this.unsubscribeFromPosts();
+        Object.keys(this.comments).forEach(postId => {
+            if (this.comments[postId].unsubscribe) {
+                this.comments[postId].unsubscribe();
+            }
+        });
+    }
+};
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+script de la comunidad:
+
+<script>
+  import { getCommunity } from '../../services/community';
+  import { savePost, subscribeToPosts, subscribeToComments, saveComment, getLikesAndDislikes, toggleReaction, categories, categoryStyles } from '../../services/post';
+  import { uploadFileToStorage } from '../../services/storage';
+  import { subscribeToAuth } from '../../services/auth';
+  import MainButton from '../../components/MainButton.vue';
+  import Quill from 'quill';
+  import 'quill/dist/quill.snow.css';
+  import Loader from "../../components/Loader.vue";
+  
+  export default {
+    name: "Community",
+    components: {MainButton, Loader},
+    data() {
+      return {
+        community: null,
+        defaultPhoto: "/default-profile.png",
+        defaultBanner: "/default-banner.jpg",
+
+        authUser: { 
+          id: null, 
+          email: null, 
+          photoURL: null, 
+          displayName: null 
+        },
+        loadingUser: true,
+        posts: [],
+        loadingPosts: true,
+        newPost: {
+            title: '',
+            content: '',
+            category: "general",
+            cover: ''
+        },
+        coverPreview: null,
+        comments: {}
+      };
+    },
+    computed: {
+    // Podemos exponer las categorías importadas
+        categoryList() {
+            return categories;
+        },
+
+        categoryStyles() {
+            return categoryStyles;
+        }
+    },
+    async mounted() {
+      const communityId  = this.$route.params.id;
+      this.community = await getCommunity(communityId );
+
+      this.unsubscribeFromAuth = subscribeToAuth(user => {
+      this.authUser = user;
+      this.loadingUser = false;
+    });
+
+    this.unsubscribeFromPosts = subscribeToPosts(newPosts => {
+            this.posts = newPosts.filter(post => post.communityId === this.community.id);
+            this.loadingPosts = false;
+            newPosts.forEach(post => {
+                if (!this.comments[post.id]) {
+                    this.comments[post.id] = [];
+                }
+                this.subscribeToPostComments(post.id);
+            });
+        });
+
+    this.$nextTick(() => {
+      if (this.$refs.editor) {
+        this.editor = new Quill(this.$refs.editor, {
+          theme: 'snow',
+          placeholder: '¿En qué estás pensando?',
+          modules: {
+            toolbar: [
+              [{ header: [1, 2, false] }],
+              ['bold', 'italic', 'underline'],
+              ['link', 'image', 'video'],
+              [{ list: 'ordered' }, { list: 'bullet' }],
+              ['clean']
+            ]
+          }
+        });
+
+        this.editor.on('text-change', () => {
+          this.newPost.content = this.editor.root.innerHTML;
+        });
+      }
+    });
+    },
+    methods: {
+      async toggleLike(postId) {
+      try {
+        await toggleReaction(postId, "like", this.authUser.id);
+        this.updatePost(postId);
+      } catch (error) {
+        console.error("Error al dar like", error);
+      }
+    },
+    async toggleDislike(postId) {
+      try {
+        await toggleReaction(postId, "dislike", this.authUser.id);
+        this.updatePost(postId);
+      } catch (error) {
+        console.error("Error al dar dislike", error);
+      }
+    },
+    isLiked(postId) {
+      const post = this.posts.find(p => p.id === postId);
+      return post && post.likes && post.likes.includes(this.authUser.id);
+    },
+    isDisliked(postId) {
+      const post = this.posts.find(p => p.id === postId);
+      return post && post.dislikes && post.dislikes.includes(this.authUser.id);
+    },
+    async updatePost(postId) {
+            const postIndex = this.posts.findIndex(p => p.id === postId);
+            if (postIndex !== -1) {
+                // Solicita la actualización del post directamente
+                this.posts[postIndex] = await getLikesAndDislikes(postId);
+            }
+        },
+
+        goToPost(postId) {
+            this.$router.push(`/post/${postId}`);
+        },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      formatDate(date) {
+            return Intl.DateTimeFormat('es-AR', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+            }).format(date).replace(',', '');
+        },
+
+      subscribeToPostComments(postId) {
+            if (!this.comments[postId]) {
+                this.comments[postId] = [];
+            }
+            return subscribeToComments(postId, newComments => {
+                this.comments[postId] = newComments;
+            });
+        },
+      async updateImage(event, type) {
+        const file = event.target.files[0];
+        if (!file || !this.community) return;
+  
+        const updates = type === "photo" ? { newPhotoFile: file } : { newBannerFile: file };
+        try {
+          const updatedURLs = await updateCommunityImages(this.community.id, updates);
+          if (updatedURLs.photoURL) this.community.photoURL = updatedURLs.photoURL;
+          if (updatedURLs.bannerURL) this.community.bannerURL = updatedURLs.bannerURL;
+        } catch (error) {
+          console.error("Error al actualizar la imagen:", error);
+        }
+      },
+
+      async createPost() {
+          if (!this.newPost.content.trim()) return;
+          try {
+            await savePost({
+              user_id: this.authUser.id,
+              email: this.authUser.email,
+              content: this.newPost.content,
+              photoURL: this.authUser.photoURL,
+              displayName: this.authUser.displayName,
+              communityId: this.community.id,
+              category: this.newPost.category,
+              title: this.newPost.title,
+              cover: this.newPost.cover
+            });
+            this.newPost.content = '';
+            this.newPost.title = "";
+            this.newPost.cover = "";
+            this.coverPreview = null;
+          } catch (error) {
+            console.error("Error al guardar el post: ", error);
+          }
+      },
+
+      handleCoverUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      // Sube la imagen a Storage y guarda la URL en newPost.cover
+      uploadFileToStorage(file, `posts/cover/${file.name}`)
+        .then(url => {
+          this.newPost.cover = url;
+          this.coverPreview = url;
+        })
+        .catch(error => {
+          console.error("Error al subir la portada:", error);
+        });
+    },
+    },
+    beforeUnmount() {
+    if (this.unsubscribeFromAuth) this.unsubscribeFromAuth();
+    if (this.unsubscribeFromPosts) this.unsubscribeFromPosts();
+    Object.keys(this.comments).forEach(postId => {
+            if (this.comments[postId].unsubscribe) {
+                this.comments[postId].unsubscribe();
+            }
+        });
+  }
+  };
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+POSTS EN LA HOME:
+
+<!-- <section>
+                <form @submit.prevent="createPost" class="create-post">
+                    
+                    <div class="post-thumbnail-form">
+                        <div class="post-title-form">
+                            <label for="title" class="font-bold">Título</label>
+                            <input v-model="newPost.title" type="text" placeholder="Escoge un título interesante para tu publicación" required id="title"/>
+                        </div>
+                        <div class="post-cover-form">
+                            
+                            <input type="file" @change="handleCoverUpload" accept="image/*" required id="cover" class="file-input"/>
+                            <label for="cover"><i class="fa-solid fa-file-image"></i>Portada</label>
+                            <div v-if="coverPreview" class="cover-preview">
+                                <img :src="coverPreview" alt="Vista previa de la portada" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ref="editor" class="quill-editor"></div>
+
+                    <label for="category">Categoría: </label>
+                    <select v-model="newPost.category" id="category">
+                        <option v-for="cat in categoryList" :key="cat" :value="cat">
+                            {{ cat === "Guia" ? "Guía" : cat }}
+                        </option>
+                    </select>
+
+                    <MainButton>Publicar</MainButton>
+                </form>
+            </section> -->
