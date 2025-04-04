@@ -108,8 +108,8 @@
                 this.authUser = newUserData;        // Actualizar los datos del usuario autenticado
                 this.profileData.displayName = this.authUser.displayName;
                 this.profileData.bio = this.authUser.bio;
-                this.photoPreview = this.authUser.photoURL || '../../public/user-circle.png';
-                this.bannerPreview = this.authUser.bannerURL || '../../public/banner.jpg'
+                this.photoPreview = this.authUser.photoURL || '/assets/users/user.png';
+                this.bannerPreview = this.authUser.bannerURL || '/assets/users/banner.webp'
             });
         },
         unmounted() {
