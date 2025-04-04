@@ -37,7 +37,7 @@
 <template>
     <div>
         <div class="banner" v-if="user.bannerURL" :style="{ backgroundImage: `url(${user.bannerURL})`}"></div>
-        <div class="banner" v-else="user.bannerURL" style="background-image: url('../assets/profile/banner.webp');"></div>
+        <div class="banner" v-else="user.bannerURL" style="background-image: url('/assets/users/banner.webp');"></div>
         
         <div class="user">
             <div class="user-img-container">
