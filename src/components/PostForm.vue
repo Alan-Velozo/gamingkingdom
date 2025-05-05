@@ -161,42 +161,41 @@
 
 <style scoped>
 
-.post-thumbnail-form{
-    display: flex;
-    justify-content: space-between;
-    padding-bottom: 50px;
-}
+    .post-thumbnail-form{
+        display: flex;
+        justify-content: space-between;
+        padding-bottom: 50px;
+    }
 
-.post-thumbnail-form .post-title-form{
-    width: 45%;
-}
+    .post-thumbnail-form .post-title-form{
+        width: 45%;
+    }
 
-.post-thumbnail-form .post-title-form input{
-    width: 100%;
-    border: 1px solid #CCCCCC;
-    padding: 10px;
-    margin-top: 15px;
-}
+    .post-thumbnail-form .post-title-form input{
+        width: 100%;
+        border: 1px solid #CCCCCC;
+        padding: 10px;
+        margin-top: 15px;
+    }
 
-.post-thumbnail-form .post-title-form input:hover{
-    border: 1px solid black;
-    transition-duration: .5s;
-    transition-property: border;
-}
+    .post-thumbnail-form .post-title-form input:hover{
+        border: 1px solid black;
+        transition-duration: .5s;
+        transition-property: border;
+    }
 
-.file-label{
-  display: flex;
-  flex-direction: column;
-}
-.error-text{
-  color: #DE1B1B;
-  padding-top: .5rem;
-}
+    .file-label{
+      display: flex;
+      flex-direction: column;
+    }
+    .error-text{
+      color: #DE1B1B;
+      padding-top: .5rem;
+    }
 
-.quill-editor {
-    min-height: 125px;
-}
-
+    .quill-editor {
+        min-height: 125px;
+    }
 
     .file-input{
         display: none;

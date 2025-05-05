@@ -161,7 +161,7 @@
   }
 
   .post-thumbnail .post-info .post-category{
-      padding: 5px 20px;
+      padding: 5px 10px;
       color: white;
   }
 

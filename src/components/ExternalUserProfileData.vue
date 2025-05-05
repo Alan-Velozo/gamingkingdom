@@ -2,7 +2,6 @@
     import TextWithDefault from './TextWithDefault.vue';
     import { getUserCommunities } from '../services/community';
 
-
     export default {
         name: 'ExternalUserProfileData',
         components: { TextWithDefault },
@@ -37,7 +36,7 @@
 <template>
     <div>
         <div class="banner" v-if="user.bannerURL" :style="{ backgroundImage: `url(${user.bannerURL})`}"></div>
-        <div class="banner" v-else="user.bannerURL" style="background-image: url('/assets/users/banner.webp');"></div>
+        <div class="banner" v-else="user.bannerURL" style="background-image: url('/assets/users/banner.png');"></div>
         
         <div class="user">
             <div class="user-img-container">
@@ -61,7 +60,7 @@
                 </div>
                 
                 <div class="user-cta">
-                    <router-link :to="`/usuario/${user.id}/chat`" class="message-profile"><i class="fa-regular fa-message" style="color: #ffffff;"></i> Enviar mensaje</router-link>
+                    <router-link :to="`/chat/usuario/${user.id}`" class="message-profile"><i class="fa-regular fa-message" style="color: #ffffff;"></i> Enviar mensaje</router-link>
                 </div>
             </div>
         </div>

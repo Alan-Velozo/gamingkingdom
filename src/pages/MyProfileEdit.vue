@@ -109,7 +109,7 @@
                 this.profileData.displayName = this.authUser.displayName;
                 this.profileData.bio = this.authUser.bio;
                 this.photoPreview = this.authUser.photoURL || '/assets/users/user.png';
-                this.bannerPreview = this.authUser.bannerURL || '/assets/users/banner.webp'
+                this.bannerPreview = this.authUser.bannerURL || '/assets/users/banner.png'
             });
         },
         unmounted() {

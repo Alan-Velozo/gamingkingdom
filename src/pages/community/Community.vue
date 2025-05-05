@@ -231,7 +231,7 @@
           {{ isMember ? '- Salir' : '+ Unirme' }}
         </button>
 
-        <router-link :to="`/community/${community.id}/chat`" class="chat-button"><i class="fa-solid fa-comments" style="color: #ffffff;"></i> Chat</router-link>
+        <router-link :to="`/chat/community/${community.id}`" class="chat-button"><i class="fa-solid fa-comments" style="color: #ffffff;"></i> Chat</router-link>
       </div>
     </div>
     <p class="community-description">{{ community.description }}</p>
@@ -341,7 +341,7 @@
   }
   
   .join-button, .chat-button, .leave-button {
-    background-color: #007bff;
+    background-color: #0d76bc;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -362,7 +362,7 @@
   }
 
   .chat-button:hover{
-    background-color: #751e22;
+    background-color: #99282d;
     transition-duration: .5s;
     transition-duration: .5s;
   }
@@ -372,7 +372,7 @@
   }
 
   .leave-button:hover{
-    background-color: #372253;
+    background-color: #532096;
     transition-duration: .5s;
     transition-duration: .5s;
   }

@@ -274,7 +274,15 @@ export async function getUserCommunities(userId) {
 
 
 
-
+export const getCommunityById = async (id) => {
+    const docRef = doc(db, 'communities', id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() };
+    } else {
+      throw new Error('Comunidad no encontrada');
+    }
+  };
 
 
 

@@ -47,6 +47,4 @@
         </div>
     </div>
 
-
 </template>
-

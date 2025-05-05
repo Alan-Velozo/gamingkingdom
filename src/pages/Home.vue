@@ -696,10 +696,10 @@
         color: #848687;
     }
 
-    .post-thumbnail .post-info .post-category{
+    /* .post-thumbnail .post-info .post-category{
         padding: 5px 20px;
         color: white;
-    }
+    } */
 
     .post-thumbnail .post-info .post-category i{
         padding-right: 10px;

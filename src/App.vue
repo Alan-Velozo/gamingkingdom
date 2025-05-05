@@ -129,9 +129,7 @@
                 <router-link to="/"><i class="fa-solid fa-house"></i></router-link>
               </li>
               <li>
-                  <button @click="toggleChatList">
-                    <i class="fa-brands fa-rocketchat"></i>
-                  </button>
+                <router-link to="/chat"><i class="fa-brands fa-rocketchat"></i></router-link>
               </li>
               <li>
                 <router-link to="/perfil"><i class="fa-solid fa-circle-user"></i></router-link>
@@ -160,9 +158,9 @@
             <template v-if="authUser.id !== null">
               <li><router-link to="/"><i class="fa-solid fa-house"></i> Inicio</router-link></li>
               <li>
-                <button @click="toggleChatList">
+                <router-link to="/chat">
                   <i class="fa-brands fa-rocketchat"></i> Mensajes
-                </button>
+                </router-link>
               </li>
               <li><router-link to="/perfil"><i class="fa-solid fa-circle-user"></i> Perfil</router-link></li>
               <li>
@@ -187,9 +185,9 @@
   </header>
 
   <!-- Menú lateral de chats -->
-  <div class="chat-list-sidebar" :class="{ 'open': showChatList }">
+  <!-- <div class="chat-list-sidebar" :class="{ 'open': showChatList }">
     <div class="chat-list-content">
-      <p>Mensajes recientes</p>
+      <p class="chat-list-title">Mensajes recientes</p>
       <ul v-if="chats.length > 0">
         <li v-for="chat in chats" :key="chat.chatId">
           <router-link :to="`/usuario/${chat.participants[0].id}/chat`">
@@ -200,7 +198,7 @@
       <p v-else class="no-chats-message">No hay mensajes.</p>
       <button @click="toggleChatList" class="close-chats">Cerrar</button>
     </div>
-  </div>
+  </div> -->
 
   <main>
     <router-view :key="$route.fullPath"/>
@@ -473,9 +471,12 @@
     flex-direction: column;
   }
 
+  .chat-list-title{
+    font-weight: bold;
+  }
+
   .chat-list-content p {
     margin-bottom: 16px;
-    font-weight: bold;
   }
 
   .chat-list-content ul {

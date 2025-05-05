@@ -2,6 +2,7 @@
   import MainButton from '../../../components/MainButton.vue';
   import Loader from '../../../components/Loader.vue';
   import { subscribeToAuth } from '../../../services/auth';
+  import { getCommunityById } from '../../../services/community';
   import { saveCommunityChatMessage, subscribeToCommunityChatMessages } from '../../../services/community-chat';
   import Quill from 'quill';
   import 'quill/dist/quill.snow.css';
@@ -17,6 +18,7 @@
         loadingMessages: true,
         communityId: this.$route.params.id,         // ID de la comunidad desde la ruta
         editor: null,                               // Instancia del editor Quill
+        community: { name: null, photoURL: null },
       };
     },
     methods: {
@@ -106,6 +108,14 @@
           console.error("El contenedor de Quill no está disponible.");
         }
       });
+
+      getCommunityById(this.communityId)
+        .then(data => {
+          this.community = data;
+        })
+        .catch(error => {
+          console.error("Error al obtener la comunidad:", error);
+        });
     },
 
     // Limpieza al desmontar el componente
@@ -118,6 +128,21 @@
 
 <template>
   <div class="community-chat-container">
+
+    <!-- Nombre de la comunidad -->
+    <div class="chat-header">
+        <span v-if="!loadingMessages">
+          <router-link :to="`/community/${communityId}`">
+            <img
+              :src="community.photoURL"
+              alt="Foto de la comunidad"
+              class="w-12 h-12 rounded-full object-cover"
+            />
+            {{ community.name }}
+          </router-link>
+        </span>
+        <span v-else>Cargando comunidad...</span>
+      </div>
 
     <!-- Área de mensajes -->
     <main class="chat-messages-container">
@@ -170,14 +195,24 @@
   .community-chat-container {
     display: flex;
     flex-direction: column;
-    height: 90vh;
-    margin-top: 1.5%;
+    height: calc(100vh - 80px);
   }
 
   .chat-header {
     padding: 1rem;
-    background-color: white;
     text-align: center;
+    border-bottom: 1px solid black;
+    font-weight: bold;
+  }
+
+  .chat-header span a{
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+  }
+
+  .chat-header span a img{
+    margin-right: 2rem;
   }
 
   .chat-messages-container {
@@ -202,13 +237,12 @@
     max-width: 70%;
     word-break: break-word;
     overflow: hidden;
-    border: 1px solid black;
-
+    color: white;
   }
 
   .message-item.sent {
     align-self: flex-end;
-    background-color: white;
+    background-color: #ef6532;
     float: right;
     flex-direction: column;
     display: block;
@@ -220,8 +254,10 @@
 
   .message-item.received {
     align-self: flex-start;
-    background-color: #f1f1f1;
+    background-color: #0d76bc;
+    color: white;
   }
+
   .message-date {
     margin-top: 1rem;
     text-align: right;

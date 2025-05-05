@@ -82,6 +82,21 @@
 
 <template>
     <div class="community-chat-container">
+
+      <!-- Nombre del usuario receptor -->
+      <div class="chat-header">
+        <span v-if="!loadingUser">
+          <router-link :to="`/usuario/${user.id}`">
+            <img
+              :src="user.photoURL"
+              alt="Foto de perfil"
+              class="w-12 h-12 rounded-full object-cover"
+            />
+            {{ user.displayName }}
+          </router-link>
+        </span>
+        <span v-else>Cargando usuario...</span>
+      </div>
   
       <!-- Área de mensajes -->
       <main class="chat-messages-container">
@@ -91,9 +106,9 @@
             :key="message.id"
             class="message-item"
             :class="{
-              'bg-[#fff]': message.sender_id == authUser.id,
+              'bg-[#0D76BC]': message.sender_id == authUser.id,
               'self-end': message.sender_id == authUser.id,
-              'bg-[#f1f1f1]': message.sender_id != authUser.id,
+              'bg-[#EF6532]': message.sender_id != authUser.id,
             }"
           >
             <p>{{ message.content }}</p>
@@ -140,14 +155,24 @@
   .community-chat-container {
     display: flex;
     flex-direction: column;
-    height: 90vh;
-    margin-top: 1.5%;
+    height: calc(100vh - 80px);
   }
 
   .chat-header {
     padding: 1rem;
-    background-color: white;
     text-align: center;
+    border-bottom: 1px solid black;
+    font-weight: bold;
+  }
+
+  .chat-header span a{
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+  }
+
+  .chat-header span a img{
+    margin-right: 2rem;
   }
 
   .chat-messages-container {
@@ -170,10 +195,9 @@
     padding: 0.75rem;
     max-width: 70%;
     width: fit-content;
-
     word-break: break-word;
-  overflow: hidden;
-  border: 1px solid black;
+    overflow: hidden;
+    color: white;  
   }
 
   .message-date {

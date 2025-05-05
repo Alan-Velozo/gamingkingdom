@@ -2,7 +2,7 @@
 
 import { createRouter, createWebHashHistory, createWebHistory } from "vue-router";
 import Home from "../pages/Home.vue";
-import Chat from "../pages/Chat.vue";
+import ChatLayout from "../pages/ChatLayout.vue";
 import Login from "../pages/Login.vue";
 import Register from "../pages/Register.vue";
 import MyProfile from "../pages/MyProfile.vue";
@@ -20,15 +20,31 @@ const routes = [
     { path: '/',                        component: Home, },
     { path: '/iniciar-sesion',          component: Login, },
     { path: '/registro',                component: Register, },
-    { path: '/chat',                    component: Chat,                meta: { requiresAuth: true } },
+    // { path: '/chat',                    component: Chat,                meta: { requiresAuth: true } },
+    {
+        path: '/chat',
+        component: ChatLayout,
+        meta: { requiresAuth: true, hideFooter: true },
+        children: [
+          {
+            path: 'usuario/:id',
+            component: PrivateChat
+          },
+          {
+            path: 'community/:id',
+            component: CommunityChat
+          },
+        ]
+      },
+      
     { path: '/perfil',                  component: MyProfile,           meta: { requiresAuth: true } },
     { path: '/perfil/editar',           component: MyProfileEdit,       meta: { requiresAuth: true } },
     { path: '/usuario/:id',             component: UserProfile,         meta: { requiresAuth: true } },
-    { path: '/usuario/:id/chat',        component: PrivateChat,         meta: { requiresAuth: true, hideFooter: true } },
+    // { path: '/usuario/:id/chat',        component: PrivateChat,         meta: { requiresAuth: true, hideFooter: true } },
     { path: '/post/:id',                component: PostDetail,          meta: { requiresAuth: true } }, 
     { path: '/community/:id',           component: Community,           meta: { requiresAuth: true } },
     { path: '/create-community',        component: CreateCommunity,     meta: { requiresAuth: true } },
-    { path: '/community/:id/chat',      component: CommunityChat,       meta: { requiresAuth: true, hideFooter: true } },
+    // { path: '/community/:id/chat',      component: CommunityChat,       meta: { requiresAuth: true, hideFooter: true } },
 
 
 ];

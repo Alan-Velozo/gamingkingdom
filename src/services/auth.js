@@ -5,7 +5,7 @@ import { getFileURL, uploadFile } from "./file-storage";
 import { getExtensionFromFile } from "../libraries/file";
 
 const defaultProfileImage = "/assets/users/user.png";
-const defaultBannerImage = "/assets/users/banner.webp";
+const defaultBannerImage = "/assets/users/banner.png";
 
 
 // Objeto que representa los datos vacíos de un usuario
