@@ -341,4 +341,14 @@
     font-weight: 500;
     padding-top: 2rem;
 }
+
+@media screen and (max-width: 600px) {
+    .area .circles li:last-of-type{
+        left: 0%;
+    }
+
+    .area .circles li:nth-child(6){
+        left: 50%;
+    }
+}
 </style>
