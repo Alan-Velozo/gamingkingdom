@@ -375,5 +375,15 @@
         .area .circles li:nth-child(6){
             left: 50%;
         }
+
+        .login-container{
+            padding: 1rem;
+        }
+    }
+
+    @media screen and (max-width: 1023px) {
+        h1{
+            width: auto;
+        }
     }
 </style>

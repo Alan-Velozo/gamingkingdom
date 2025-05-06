@@ -310,45 +310,55 @@
 
 
 
-@keyframes animate {
+    @keyframes animate {
 
-    0%{
-        transform: translateY(0) rotate(0deg);
-        opacity: 1;
-        border-radius: 0;
+        0%{
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+            border-radius: 0;
+        }
+
+        100%{
+            transform: translateY(-1000px) rotate(720deg);
+            opacity: 0;
+            border-radius: 50%;
+        }
+
     }
 
-    100%{
-        transform: translateY(-1000px) rotate(720deg);
-        opacity: 0;
-        border-radius: 50%;
+    .register-ask{
+        padding-bottom: 3rem;
     }
 
-}
-
-.register-ask{
-    padding-bottom: 3rem;
-}
-
-.register-ask a{
-    color: #0d71b8;
-    text-decoration: underline;
-}
-
-
-.error{
-    color: darkred;
-    font-weight: 500;
-    padding-top: 2rem;
-}
-
-@media screen and (max-width: 600px) {
-    .area .circles li:last-of-type{
-        left: 0%;
+    .register-ask a{
+        color: #0d71b8;
+        text-decoration: underline;
     }
 
-    .area .circles li:nth-child(6){
-        left: 50%;
+
+    .error{
+        color: darkred;
+        font-weight: 500;
+        padding-top: 2rem;
     }
-}
+
+    @media screen and (max-width: 600px) {
+        .area .circles li:last-of-type{
+            left: 0%;
+        }
+
+        .area .circles li:nth-child(6){
+            left: 50%;
+        }
+
+        .login-container{
+            padding: 1rem;
+        }
+    }
+
+    @media screen and (max-width: 1023px) {
+        h1{
+            width: auto;
+        }
+    }
 </style>
