@@ -377,7 +377,14 @@
         }
 
         .login-container{
-            padding: 1rem;
+            padding: 3rem 1rem;
+            gap: 0rem;
+        }
+
+        .login-container .login-form form .email input,
+        .login-container .login-form form .password input{
+            font-size: 1rem;
+            padding: .25rem;
         }
     }
 
