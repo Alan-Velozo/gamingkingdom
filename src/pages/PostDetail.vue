@@ -354,7 +354,6 @@
     border-top: 1px solid #CCCCCC;
     border-bottom: 1px solid #CCCCCC;
     padding: 1rem 0;
-    margin-top: 50px;
     font-weight: bold;
     font-size: 1.25rem;
     display: flex;
