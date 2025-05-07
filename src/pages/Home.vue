@@ -269,7 +269,7 @@
     </template>
 
     <template v-else>
-        <div class="m-auto pt-10 pb-20">
+        <div class="feed">
 
             <PostForm
                 :initialPostData="{ title: '', content: '', category: 'General', cover: '' }"
@@ -591,6 +591,11 @@
         }
     }
 
+    .feed{
+        margin: auto;
+        padding: 1rem 0 5rem 0;
+    }
+
     .masonry-gallery {
         columns: 3; 
         column-gap: 50px; 
@@ -641,6 +646,10 @@
     @media screen and (max-width: 700px){
         .masonry-gallery {
             columns: 1; 
+        }
+
+        .feed{
+            padding: .1rem 0 1rem 0;
         }
     };
 

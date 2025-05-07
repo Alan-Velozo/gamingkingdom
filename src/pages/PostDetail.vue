@@ -361,7 +361,7 @@
   }
 
   .comment-reactions{
-    padding: 2rem 0 0 0;
+    padding: 2rem 0 1rem 0;
     font-weight: bold;
   }
 
@@ -400,7 +400,6 @@
   }
 
   .comment{
-    padding: 1%;
     border-bottom: 1px solid black;
     word-break: break-word;
     overflow: hidden;
@@ -413,8 +412,7 @@
   }
 
   .comment-info{
-    padding-bottom: 1rem;
-    padding-top: 1rem;
+    padding: 1.5rem 0 1rem 0;
   }
 
   .post-info img, .comment-info img{
@@ -438,6 +436,14 @@
     min-height: 100px;
   }
 
+  .post-content{
+    padding-bottom: 2.5rem;
+  }
+
+  .post-date, .comment-date{
+    color: #848687;
+  }
+
   @media screen and (max-width: 700px) {
     .post-info .post-username, .comment-info .comment-username{
       font-size: 1rem;
@@ -447,16 +453,15 @@
       margin-left: auto;
       font-size: .5rem;
     }
+
+    .post-content{
+      padding-bottom: 0;
+    }
   }
 
   .post-info .post-date, .comment-date{
     margin-left: auto;
     font-size: 1.10rem;
-    font-weight: 300;
-  }
-
-  .post-content{
-    padding-bottom: 2.5rem;
   }
 
   .post-file{

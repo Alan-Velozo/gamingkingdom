@@ -386,9 +386,9 @@
     margin: 10px auto;
   }
 
-  .posts{
+  /* .posts{
     margin-top: 100px;
-  }
+  } */
 
   #posts ul{
     display: grid;

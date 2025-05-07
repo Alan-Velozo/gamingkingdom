@@ -181,7 +181,7 @@
             <UserProfileData :user="authUser" />
 
             <section class="mb-20 min-h-[600px]">
-                <div class="tabs-container m-auto mb-32 w-fit flex gap-28"> <!-- Contenedor de pestañas -->
+                <div class="tabs-container m-auto w-fit flex gap-28"> <!-- Contenedor de pestañas -->
                     <button 
                         @click="activeTab = 'my-activity'"
                         :class="{ 'border-b-4 pb-1': activeTab === 'my-activity' }"
@@ -270,6 +270,10 @@
         border-radius: 50%;
         width: 40px;
         height: 40px;
+    }
+
+    .tabs-container{
+        margin-bottom: 5rem;
     }
 
     .masonry-gallery {
