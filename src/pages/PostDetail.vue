@@ -453,9 +453,6 @@
       font-size: .5rem;
     }
 
-    .post-content{
-      padding-bottom: 0;
-    }
   }
 
   .post-info .post-date, .comment-date{
