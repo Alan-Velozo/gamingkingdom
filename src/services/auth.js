@@ -47,6 +47,7 @@ onAuthStateChanged(auth, async user => {
         setUserData({
             bio: userProfile.bio,
             bannerURL: userProfile.bannerURL || "",
+            favoriteGame: userProfile.favoriteGame || null,
             fullyLoaded: true,              // Indica que los datos del usuario están completamente cargados
         });
     } else {
@@ -67,12 +68,13 @@ export async function register(email, password) {
         const defaultDisplayName = `Jugador #${Math.floor(1000 + Math.random() * 9000)}`;
         const defaultPhotoURL = defaultProfileImage; 
         const defaultBannerURL = defaultBannerImage;
+        const defaultFavoriteGame = "Sin videojuego favorito :("
 
         // Actualiza el perfil del usuario en Firebase Authentication
         await updateProfile(user, { displayName: defaultDisplayName, photoURL: defaultPhotoURL });
 
         // Crea el perfil del usuario en Firestore
-        await createUserProfile(user.uid, { email, displayName: defaultDisplayName, photoURL: defaultPhotoURL, bannerURL: defaultBannerURL });
+        await createUserProfile(user.uid, { email, displayName: defaultDisplayName, photoURL: defaultPhotoURL, bannerURL: defaultBannerURL, favoriteGame: defaultFavoriteGame });
 
         // Actualiza los datos del usuario en el estado local
         setUserData({
@@ -81,6 +83,7 @@ export async function register(email, password) {
             displayName: defaultDisplayName,
             photoURL: defaultPhotoURL,
             bannerURL: defaultBannerURL,
+            favoriteGame: defaultFavoriteGame,
             fullyLoaded: true,
         });
     } catch (error) {
@@ -173,6 +176,23 @@ export async function updateUserBanner(banner) {
         throw error;
     }
 }
+
+
+
+
+export async function updateUserFavoriteGame(favoriteGame) {
+    try {
+      // Actualiza Firestore
+      await updateUserProfile(userData.id, { favoriteGame });
+  
+      // Actualiza el estado local
+      setUserData({ favoriteGame });
+    } catch (error) {
+      console.error("[auth.js updateUserFavoriteGame] Error al actualizar el juego favorito:", error);
+      throw error;
+    }
+  }
+  
 
 
 

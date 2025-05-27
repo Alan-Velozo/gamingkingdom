@@ -48,6 +48,9 @@
                     <li class="user-username"><TextWithDefault :value="user.displayName" /></li>
                     <li class="user-email">{{ user.email }}</li>
                     <li class="user-bio"><TextWithDefault :value="user.bio" default-value="Sin biografía." /></li>
+                    <li class="user-favorite-game" v-if="user.favoriteGame && typeof user.favoriteGame === 'object'">
+                        <i class="fa-solid fa-star" style="color: #000000;"></i> {{ user.favoriteGame.name }}
+                    </li>
                 </ul>
 
                 <div v-if="!loadingCommunities && communities.length > 0" class="user-communities">
@@ -117,7 +120,7 @@
 
     .user-data-list .user-username {
         font-size: 3.5rem;
-        font-family: "Jersey 10", sans-serif;
+        font-family: "Jersey 15", sans-serif;
     }
 
     .user-data-list .user-email {
@@ -136,6 +139,14 @@
     .user-communities ul li{
         color: #613b93;
         font-weight: 500;
+    }
+
+    .user-favorite-game{
+        font-weight: bold;
+    }
+
+    .user-favorite-game i{
+        padding-right: .5rem;
     }
 
     @media screen and (max-width: 1023px) {

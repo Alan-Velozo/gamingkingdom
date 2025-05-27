@@ -309,14 +309,24 @@
 
 <style scoped>
 
-    .content{
+    /* .content{
         padding: 0 10%;
+    } */
+
+    section, .banner{
+        padding: 0 10%;
+    }
+
+    section:nth-child(2){
+        background: black;
+        color: white;
+        padding: 3rem 10%;
     }
 
     .banner{
         width: 100%;
         align-content: center;
-        padding: 5rem 0;
+        padding: 5rem 10% 10rem 10%;
     }
 
     .banner .banner-content{
@@ -327,21 +337,24 @@
     }
 
     .banner .banner-content .banner-1 h1{
-        font-family: "Jersey 10", sans-serif;
-        font-size: 5rem;
+        font-family: "Jersey 15", sans-serif;
+        font-size: 6rem;
         letter-spacing: 5px;
         padding-left: 0;
-        word-wrap: normal;
         max-width: none;
+        font-weight: 500;
+        line-height: 1;
     }
 
     .banner .banner-content .banner-1 p{
         max-width: 40vw;
+        padding: 3rem 0;
     }
 
     .banner .banner-content .banner-2 img{
         max-width: 100%;
         width: 100%;
+        min-width: 400px;
     }
 
     .banner .banner-content .banner-1 .banner-cta{
@@ -384,6 +397,20 @@
         transition-duration: .5s;
     }
 
+    @media screen and (max-width: 1340px) {
+
+        .banner .banner-content .banner-1 h1{
+            font-size: 5rem;
+        }
+
+        .banner .banner-content .banner-2 img{
+            min-width: auto;
+        }
+
+        .section-2 .section-2-content .section-2-text h2{
+            line-height: 1;
+        }
+    }
 
     @media screen and (max-width: 1023px) {
         
@@ -437,15 +464,11 @@
     
     }
 
-    .p1 p, .p2 p{
-        padding: 1em;
-    }
-
     .text-heading{
         font-size: 5rem;
         margin-bottom: 5rem;
         text-decoration: underline;
-        font-family: "Jersey 10", sans-serif;
+        font-family: "Jersey 15", sans-serif;
     }
 
     .p1, .p2{
@@ -490,7 +513,7 @@
     .section-2 .section-2-content{
         display: grid;
         grid-template-columns: 50% 50%;
-        padding-bottom: 5rem;
+        padding: 5rem 0;
     }
 
     .section-2 .section-2-content .section-2-text{
@@ -500,7 +523,7 @@
 
     .section-2 .section-2-content .section-2-text h2{
         font-size: 4.5rem;
-        font-family: "Jersey 10", sans-serif;
+        font-family: "Jersey 15", sans-serif;
         letter-spacing: 3px;
     }
 
@@ -514,7 +537,7 @@
     }
 
     .feed-heading{
-        font-family: "Jersey 10" , "sans-serif";
+        font-family: "Jersey 15" , "sans-serif";
         font-size: 4rem;
         text-align: center;
         padding: 3rem 0 5rem 0;
@@ -541,7 +564,7 @@
 
         .banner .banner-content .banner-1 p{
             max-width: none;
-            padding: 1rem 0;
+            padding: 2rem 0 1rem 0;
         }
 
     }

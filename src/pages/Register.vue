@@ -214,7 +214,7 @@
     }
 
     .context h1{
-        font-family: "Jersey 10", sans-serif;
+        font-family: "Jersey 15", sans-serif;
         font-size: 3rem;
         letter-spacing: 3px;
         margin-top: 0;

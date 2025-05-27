@@ -1,6 +1,6 @@
 <script>
     import MainButton from '../components/MainButton.vue';
-    import { subscribeToAuth, updateUser, updateUserPhoto, updateUserBanner } from '../services/auth';
+    import { subscribeToAuth, updateUser, updateUserPhoto, updateUserBanner, updateUserFavoriteGame } from '../services/auth';
 
     export default {
         name: 'MyProfileEdit',
@@ -29,7 +29,26 @@
                 uploadingBanner: false,
 
                 photoSizeError: "",
-                bannerSizeError: ""
+                bannerSizeError: "",
+
+                favoriteGameSearch: '',
+                favoriteGameResults: [],
+                favoriteGameSelected: null,
+                favoriteGameLoading: false,
+                searchTimeout: null,
+            }
+        },
+        watch: {
+            favoriteGameSearch(newValue) {
+                clearTimeout(this.searchTimeout);
+                if (newValue.trim().length < 2) {
+                    this.favoriteGameResults = [];
+                    return;
+                }
+
+                this.searchTimeout = setTimeout(() => {
+                    this.searchFavoriteGames(newValue);
+                }, 300); // Espera 300ms para evitar spamear la API
             }
         },
         methods: {
@@ -101,7 +120,68 @@
                 });
 
                 reader.readAsDataURL(file);
-            }
+            },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            async searchFavoriteGames(query) {
+      this.favoriteGameLoading = true;
+      try {
+        const response = await fetch(`https://api.rawg.io/api/games?key=e90ff13c35064a99aa18494691b1e26b&search=${encodeURIComponent(query)}&page_size=5`);
+        const data = await response.json();
+        this.favoriteGameResults = data.results;
+      } catch (error) {
+        console.error('Error al buscar juegos:', error);
+      } finally {
+        this.favoriteGameLoading = false;
+      }
+    },
+    async selectFavoriteGame(game) {
+        this.favoriteGameSelected = {
+            id: game.id,
+            name: game.name
+        };
+        this.favoriteGameResults = [];
+        this.favoriteGameSearch = game.name;
+
+        try {
+            await updateUserFavoriteGame(this.favoriteGameSelected);
+        } catch (error) {
+            console.error('Error al guardar el juego favorito:', error);
+        }
+    },
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
         },
         mounted() {
             this.unsubscribeFromAuth = subscribeToAuth(newUserData => {
@@ -188,6 +268,29 @@
                 </div>
             </div>
 
+
+
+
+
+
+
+            <div class="favorite-videogame">
+                <label class="block font-semibold mb-1">Videojuego favorito</label>
+                <input type="text" v-model="favoriteGameSearch" placeholder="Escribe tu juego favorito..."/>
+
+                <ul v-if="favoriteGameResults.length > 0" class="border bg-white shadow">
+                    <li
+                    v-for="game in favoriteGameResults"
+                    :key="game.id"
+                    class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    @click="selectFavoriteGame(game)"
+                    >
+                    {{ game.name }}
+                    </li>
+                </ul>
+
+            </div>
+
             <button type="submit">
                 {{ editingProfile ? 'Cargando...' : 'Editar' }}
             </button>
@@ -230,7 +333,7 @@
     h1{
         font-size: 4rem;
         text-align: center;
-        font-family: "Jersey 10", sans-serif;
+        font-family: "Jersey 15", sans-serif;
         font-weight: bold;
     }
 
@@ -262,7 +365,7 @@
 
     form label, span{
         font-size: 2rem;
-        font-family: "Jersey 10", sans-serif;
+        font-family: "Jersey 15", sans-serif;
     }
 
     .photo-preview, .banner-preview{
@@ -297,7 +400,7 @@
         background: #0d76bc;
         padding: 10px 0;
         color: white;
-        font-family: "Jersey 10", sans-serif;
+        font-family: "Jersey 15", sans-serif;
         font-size: 2.5rem;
         margin-top: 50px;
     }
@@ -306,6 +409,12 @@
         background: #084f7e;
         transition-property: background;
         transition-duration: .5s
+    }
+
+    form .favorite-videogame{
+        display: flex;
+        flex-direction: column;
+        padding: 2rem 0 0 0;
     }
 
 

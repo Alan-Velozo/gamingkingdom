@@ -469,26 +469,26 @@
 
 
   .comments-section{
-      padding: 0 5%;
+    padding: 0 5%;
+  }
+
+
+
+
+
+  @media screen and (max-width: 1023px) {
+      
+    .post img, .post video{
+      height: fit-content;
+      width: 100%;
     }
 
-
-
-
-
-    @media screen and (max-width: 1023px) {
-      
-      .post img, .post video{
-        height: fit-content;
-        width: 100%;
-      }
-
-      .post .post-info img{
-        height: 50px;
-        width: 50px;
-      }
-      
+    .post .post-info img{
+      height: 50px;
+      width: 50px;
     }
+      
+  }
 
 
 
@@ -503,8 +503,5 @@
       font-size: 1rem;
     }
   }
-
-
-  
 
 </style>

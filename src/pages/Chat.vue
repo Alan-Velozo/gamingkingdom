@@ -138,7 +138,7 @@
 <style scoped>
 
     h1{
-        font-family: "Jersey 10", "sans-serif";
+        font-family: "Jersey 15", "sans-serif";
         font-size: 4rem;
     }
 

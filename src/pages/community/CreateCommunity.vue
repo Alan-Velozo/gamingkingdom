@@ -196,7 +196,7 @@
     h1{
         font-size: 4rem;
         text-align: center;
-        font-family: "Jersey 10", sans-serif;
+        font-family: "Jersey 15", sans-serif;
         font-weight: bold;
         max-width: none;
         margin-top: none;
@@ -232,7 +232,7 @@
 
     form label{
         font-size: 2rem;
-        font-family: "Jersey 10", sans-serif;
+        font-family: "Jersey 15", sans-serif;
     }
 
     .file-label .file-placeholder{
@@ -272,7 +272,7 @@
         background: #0d76bc;
         padding: 10px 0;
         color: white;
-        font-family: "Jersey 10", sans-serif;
+        font-family: "Jersey 15", sans-serif;
         font-size: 2.5rem;
         margin-top: 50px;
     }

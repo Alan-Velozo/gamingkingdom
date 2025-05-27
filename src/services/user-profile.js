@@ -14,7 +14,8 @@ export async function getUserProfileById(id) {
             displayName: userDoc.data().displayName,
             bio: userDoc.data().bio,
             photoURL: userDoc.data().photoURL,
-            bannerURL: userDoc.data().bannerURL
+            bannerURL: userDoc.data().bannerURL,
+            favoriteGame: userDoc.data().favoriteGame
         }   
     } catch (error) {
         console.error("[user-profile.js getUserProfileById] Error: ", error);
