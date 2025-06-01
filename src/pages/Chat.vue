@@ -79,7 +79,7 @@
     <h1 class="pt-10 text-center">Chat general</h1>
 
     <div class="p-5">
-        <section class="">
+        <div class="">
             <h2 class="sr-only">Lista de mensajes</h2>
             <div class="p-4 min-h-[400px]">
                 <ul v-if="!loadingMessages" class="flex flex-col items-start">
@@ -113,8 +113,8 @@
                 </ul>
                 <ChatLoader v-else />
             </div>
-        </section>
-        <section class="">
+        </div>
+        <div class="">
             <form 
                 action="#"
                 @submit.prevent="sendMessage"
@@ -129,7 +129,7 @@
                     ></textarea>
                 <MainButton class="h-[4.1rem] w-24"><i class="fa-solid fa-paper-plane" style="color: #ffffff;"></i></MainButton>
             </form>
-        </section>
+        </div>
     </div>
 </template>
 

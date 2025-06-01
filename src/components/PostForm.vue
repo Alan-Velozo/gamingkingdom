@@ -121,7 +121,7 @@
 
 
 <template>
-    <section>
+    <div>
             <form @submit.prevent="handleSubmit" class="create-post">
                     
                 <div class="post-thumbnail-form">
@@ -156,7 +156,7 @@
 
                 <MainButton>Publicar</MainButton>
             </form>
-    </section>
+    </div>
 </template>
 
 <style scoped>

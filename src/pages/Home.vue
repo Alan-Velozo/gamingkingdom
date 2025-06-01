@@ -277,7 +277,7 @@
                 @upload-cover="handleUploadCover"
             />
 
-            <section class="w-[100%]">
+            <div class="w-[100%]">
                 <div class="p-4 w-[95vw] m-auto">
                     <ul v-if="!loadingPosts" class="masonry-gallery">
                         <li v-for="post in posts" :key="post.id" class="item">
@@ -300,7 +300,7 @@
                         <Loader />
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
     </template>
 

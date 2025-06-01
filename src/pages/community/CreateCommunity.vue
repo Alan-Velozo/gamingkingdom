@@ -197,7 +197,7 @@
         font-size: 4rem;
         text-align: center;
         font-family: "Jersey 15", sans-serif;
-        font-weight: bold;
+        font-weight: 500;
         max-width: none;
         margin-top: none;
         padding-left: 0;

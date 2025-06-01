@@ -82,7 +82,7 @@
         </div>
         
         <template v-else>
-          <section>
+          <div>
             <ul>
               <li 
                 v-for="chat in privateChats" 
@@ -97,9 +97,9 @@
                 </router-link>
               </li>
             </ul>
-          </section>
+          </div>
 
-          <section>
+          <div>
             <ul>
               <li 
                 v-for="community in communities" 
@@ -114,7 +114,7 @@
                 </router-link>
               </li>
             </ul>
-          </section>
+          </div>
         </template>
       </template>
     </div>
