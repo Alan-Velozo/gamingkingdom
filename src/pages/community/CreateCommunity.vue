@@ -26,11 +26,6 @@
                 const file = event.target.files[0];
                 if (!file) return;          // Si no hay archivo, termina la ejecución
 
-                // if (!this.name.trim()) {
-                //     alert("Por favor, ingresa un nombre para la comunidad antes de subir imágenes.");
-                //     return;
-                // }
-
                  // Validación de tamaño máximo (20MB)
                 const maxSize = 20 * 1024 * 1024; // 20MB en bytes
                 if (file.size > maxSize) {

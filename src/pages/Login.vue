@@ -182,46 +182,45 @@
 
     }
 
-.context {
-    width: 100%;    
-}
+    .context {
+        width: 100%;    
+    }
 
-.context h1{
-    font-family: "Jersey 15", sans-serif;
-    font-size: 3rem;
-    font-weight: 500;
-    padding-bottom: 3rem;
-    letter-spacing: 3px;
-    margin-top: 0;
-    padding-left: 0;
-}
+    .context h1{
+        font-family: "Jersey 15", sans-serif;
+        font-size: 3rem;
+        font-weight: 500;
+        padding-bottom: 3rem;
+        letter-spacing: 3px;
+        margin-top: 0;
+        padding-left: 0;
+    }
 
-.area{
-    width: 100%;    
-   
-}
-
-.circles{
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.circles li{
-    position: absolute;
-    display: block;
-    list-style: none;
-    width: 20px;
-    height: 20px;
-    background: rgba(255, 255, 255, 0.2);
-    animation: animate 25s linear infinite;
-    bottom: -150px;
+    .area{
+        width: 100%;    
     
-}
+    }
 
-.circles li:nth-child(1){
+    .circles{
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .circles li{
+        position: absolute;
+        display: block;
+        list-style: none;
+        width: 20px;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        animation: animate 25s linear infinite;
+        bottom: -150px;
+    }
+
+    .circles li:nth-child(1){
         left: 25%;
         width: 80px;
         height: 80px;

@@ -64,6 +64,7 @@
                     await updateUser({
                         displayName: this.profileData.displayName,
                         bio: this.profileData.bio,
+                        favoriteGame: this.favoriteGameSelected ?? this.authUser.favoriteGame ?? null
                     });
 
                     // Si se seleccionó una nueva foto, se actualiza la foto del perfil
@@ -122,65 +123,26 @@
                 reader.readAsDataURL(file);
             },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             async searchFavoriteGames(query) {
-      this.favoriteGameLoading = true;
-      try {
-        const response = await fetch(`https://api.rawg.io/api/games?key=e90ff13c35064a99aa18494691b1e26b&search=${encodeURIComponent(query)}&page_size=5`);
-        const data = await response.json();
-        this.favoriteGameResults = data.results;
-      } catch (error) {
-        console.error('Error al buscar juegos:', error);
-      } finally {
-        this.favoriteGameLoading = false;
-      }
-    },
-    async selectFavoriteGame(game) {
-        this.favoriteGameSelected = {
-            id: game.id,
-            name: game.name
-        };
-        this.favoriteGameResults = [];
-        this.favoriteGameSearch = game.name;
-
-        try {
-            await updateUserFavoriteGame(this.favoriteGameSelected);
-        } catch (error) {
-            console.error('Error al guardar el juego favorito:', error);
-        }
-    },
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                this.favoriteGameLoading = true;
+                try {
+                    const response = await fetch(`https://api.rawg.io/api/games?key=e90ff13c35064a99aa18494691b1e26b&search=${encodeURIComponent(query)}&page_size=5`);
+                    const data = await response.json();
+                    this.favoriteGameResults = data.results;
+                } catch (error) {
+                    console.error('Error al buscar juegos:', error);
+                } finally {
+                    this.favoriteGameLoading = false;
+                }
+            },
+            async selectFavoriteGame(game) {
+                this.favoriteGameSelected = {
+                    id: game.id,
+                    name: game.name
+                };
+                this.favoriteGameResults = [];
+                this.favoriteGameSearch = game.name;
+            }
             
         },
         mounted() {
@@ -268,12 +230,6 @@
                 </div>
             </div>
 
-
-
-
-
-
-
             <div class="favorite-videogame">
                 <label class="block font-semibold mb-1">Videojuego favorito</label>
                 <input type="text" v-model="favoriteGameSearch" placeholder="Escribe tu juego favorito..."/>
@@ -297,32 +253,6 @@
         </form>
     </div>
 </template> 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <style scoped>
 
@@ -437,18 +367,6 @@
             margin-top: 0;
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
     .file-label{
         display: flex;

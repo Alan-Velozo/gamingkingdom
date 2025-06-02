@@ -105,24 +105,33 @@ export function login(email, password) {
 }
 
 // Función para actualizar el nombre y la biografía del usuario
-export async function updateUser({ displayName, bio }) {
+export async function updateUser({ displayName, bio, favoriteGame }) {
     try {
-        // Actualiza el nombre del usuario en Firebase Authentication
         const authPromise = updateProfile(auth.currentUser, { displayName });
 
-        // Actualiza el nombre y la biografía del usuario en Firestore
-        const firestorePromise = updateUserProfile(userData.id, { displayName, bio });
+        // Armamos el objeto dinámicamente
+        const updatedProfile = { displayName, bio };
+        if (typeof favoriteGame !== 'undefined') {
+            updatedProfile.favoriteGame = favoriteGame;
+        }
 
-        // Ejecuta ambas promesas en paralelo
+        const firestorePromise = updateUserProfile(userData.id, updatedProfile);
+
         await Promise.all([authPromise, firestorePromise]);
 
-        // Notifica los cambios del nombre de usuario al estado local
-        setUserData({ displayName, bio });
+        // Lo mismo para el estado local
+        const updatedUserData = { displayName, bio };
+        if (typeof favoriteGame !== 'undefined') {
+            updatedUserData.favoriteGame = favoriteGame;
+        }
+
+        setUserData(updatedUserData);
     } catch (error) {
-        console.error("[auth.js updateUser] Error al actualizar el nombre o bio: ", error);
+        console.error("[auth.js updateUser] Error al actualizar el nombre, bio o juego favorito:", error);
         throw error;
     }
 }
+
 
 
 // Función para actualizar la foto de perfil del usuario
@@ -191,7 +200,7 @@ export async function updateUserFavoriteGame(favoriteGame) {
       console.error("[auth.js updateUserFavoriteGame] Error al actualizar el juego favorito:", error);
       throw error;
     }
-  }
+}
   
 
 
