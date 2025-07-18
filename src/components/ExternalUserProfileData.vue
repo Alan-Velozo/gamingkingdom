@@ -1,6 +1,7 @@
 <script>
     import TextWithDefault from './TextWithDefault.vue';
     import { getUserCommunities } from '../services/community';
+    import { isFollowing, followUser, unfollowUser, getFollowersCount, getFollowingCount } from '../services/user-profile';
 
     export default {
         name: 'ExternalUserProfileData',
@@ -10,12 +11,25 @@
                 type: Object,
                 required: true,
                 loadingCommunities: true,
+            },
+            authUser: {
+                type: Object,
+                required: false,
+                default: null
+            },
+            showFollow: {
+                type: Boolean,
+                default: false
             }
         },
         data(){
             return{
                 communities: [],
                 loadingCommunities: true,
+                isFollowingUser: false,
+                followersCount: 0,
+                followingCount: 0,
+                loadingFollow: false,
             }
         },
         async mounted() {
@@ -28,6 +42,30 @@
                     console.error("Error al cargar las comunidades:", error);
                 }
                 this.loadingCommunities = false;
+            }
+            // Lógica de seguidores/seguidos
+            if (this.authUser && this.authUser.id && this.user.id && this.authUser.id !== this.user.id) {
+                this.isFollowingUser = await isFollowing(this.authUser.id, this.user.id);
+            }
+            if (this.user.id) {
+                this.followersCount = await getFollowersCount(this.user.id);
+                this.followingCount = await getFollowingCount(this.user.id);
+            }
+        },
+        methods: {
+            async toggleFollow() {
+                if (!this.authUser || !this.authUser.id || !this.user.id || this.authUser.id === this.user.id) return;
+                this.loadingFollow = true;
+                if (this.isFollowingUser) {
+                    await unfollowUser(this.authUser.id, this.user.id);
+                    this.isFollowingUser = false;
+                    this.followersCount--;
+                } else {
+                    await followUser(this.authUser.id, this.user.id);
+                    this.isFollowingUser = true;
+                    this.followersCount++;
+                }
+                this.loadingFollow = false;
             }
         }
     }
@@ -63,7 +101,19 @@
                 </div>
                 
                 <div class="user-cta">
-                    <router-link :to="`/chat/usuario/${user.id}`" class="message-profile"><i class="fa-regular fa-message" style="color: #ffffff;"></i> Enviar mensaje</router-link>
+                    <router-link :to="`/chat/usuario/${user.id}`" class="message-profile bg-[#623B97]"><i class="fa-regular fa-message" style="color: #ffffff;"></i> Enviar mensaje</router-link>
+                </div>
+                <!-- Botón de seguir/dejar de seguir y contadores -->
+                <div v-if="showFollow" class="mt-4">
+                    <button @click="toggleFollow" :disabled="loadingFollow" :class="isFollowingUser ? 'bg-[#C0282E]' : 'bg-[#1D71B8]'" class="follow-button">
+                        <span v-if="!isFollowingUser"><i class="fa-solid fa-user-plus"></i></span>
+                        <span v-else><i class="fa-solid fa-user-minus"></i></span>
+                        {{ isFollowingUser ? 'Dejar de seguir' : 'Seguir' }}
+                    </button>
+                </div>
+                <div class="flex justify-between mt-10">
+                    <span><b>{{ followersCount }}</b> seguidores</span>
+                    <span><b>{{ followingCount }}</b> seguidos</span>
                 </div>
             </div>
         </div>
@@ -102,15 +152,14 @@
         padding-top: 2rem;
     }
 
-    .user-cta .message-profile {
-        background: #1D71B8;
+    .user-cta .message-profile, .follow-button {
         color: white;
         padding: .5rem 1rem;
         width: 100%;
         text-align: center;
     }
 
-    .user-cta .message-profile i{
+    .user-cta .message-profile i, .follow-button i{
         padding-right: 1rem;
     }
 

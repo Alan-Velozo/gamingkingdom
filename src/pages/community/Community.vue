@@ -359,22 +359,22 @@
   }
 
   .chat-button{
-    background: #bf3138;
+    background: #623B97;
     margin-left: 1rem
   }
 
   .chat-button:hover{
-    background-color: #99282d;
+    background-color: #422866;
     transition-duration: .5s;
     transition-duration: .5s;
   }
 
   .leave-button{
-    background: #613b93;
+    background: #bf3138;
   }
 
   .leave-button:hover{
-    background-color: #532096;
+    background-color: #99282d;
     transition-duration: .5s;
     transition-duration: .5s;
   }

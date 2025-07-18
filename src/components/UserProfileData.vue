@@ -2,6 +2,7 @@
     import Loader from './Loader.vue';
     import TextWithDefault from './TextWithDefault.vue';
     import { getUserCommunities } from '../services/community';
+    import { getFollowersCount, getFollowingCount } from '../services/user-profile';
 
     export default {
         name: 'UserProfileData',
@@ -17,6 +18,8 @@
             return{
                 communities: [],
                 loadingCommunities: true,
+                followersCount: 0,
+                followingCount: 0,
             }
         },
         async mounted() {
@@ -25,6 +28,8 @@
                 try {
                     // Obtener las comunidades del usuario
                     this.communities = await getUserCommunities(this.user.id);
+                    this.followersCount = await getFollowersCount(this.user.id);
+                    this.followingCount = await getFollowingCount(this.user.id);
                 } catch (error) {
                     console.error("Error al cargar las comunidades:", error);
                 }
@@ -56,6 +61,11 @@
                         <i class="fa-solid fa-star" style="color: #000000;"></i> {{ user.favoriteGame.name }}
                     </li>
                 </ul>
+
+                <div class="flex justify-between mt-4">
+                    <span><b>{{ followersCount }}</b> seguidores</span>
+                    <span><b>{{ followingCount }}</b> seguidos</span>
+                </div>
 
                 <div v-if="!loadingCommunities && communities.length > 0" class="user-communities">
                     <p><i class="fa-solid fa-people-group"></i> Comunidades</p>

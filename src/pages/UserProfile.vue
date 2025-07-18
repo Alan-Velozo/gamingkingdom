@@ -1,7 +1,7 @@
 <script>
     import Loader from '../components/Loader.vue';
     import ExternalUserProfileData from '../components/ExternalUserProfileData.vue';
-    import { getUserProfileById } from '../services/user-profile';
+    import { getUserProfileById, isFollowing, followUser, unfollowUser, getFollowersCount, getFollowingCount } from '../services/user-profile';
     import { subscribeToPosts, subscribeToComments, getLikesAndDislikes, toggleReaction, categories, categoryStyles, toggleSavePost, getSavedPosts } from '../services/post';
     import { subscribeToAuth } from '../services/auth';
     import PostItem from '../components/PostItem.vue';
@@ -28,6 +28,9 @@
                 unsubscribeFromAuth: () => {}, // Función para cancelar suscripción de autenticación
                 unsubscribeComments: () => {}, // Función para cancelar suscripción de comentarios
                 savedPosts: [], // Lista de publicaciones guardadas por el usuario autenticado
+                isFollowingUser: false, // Si el usuario autenticado sigue a este perfil
+                followersCount: 0,
+                followingCount: 0,
             }
         },
         computed: {
@@ -61,6 +64,13 @@
             // Obtener datos del perfil del usuario desde la ruta
             this.user = await getUserProfileById(this.$route.params.id);
             this.userLoaded = true;
+
+            // Lógica de seguidores/seguidos
+            if (this.authUser.id && this.user.id && this.authUser.id !== this.user.id) {
+                this.isFollowingUser = await isFollowing(this.authUser.id, this.user.id);
+            }
+            this.followersCount = await getFollowersCount(this.user.id);
+            this.followingCount = await getFollowingCount(this.user.id);
 
             console.log(this.user);
 
@@ -180,7 +190,21 @@
                     // Solicita la actualización del post directamente
                     this.posts[postIndex] = await getLikesAndDislikes(postId);
                 }
-            }
+            },
+
+            // Seguir o dejar de seguir usuario
+            async toggleFollow() {
+                if (!this.authUser.id || !this.user.id || this.authUser.id === this.user.id) return;
+                if (this.isFollowingUser) {
+                    await unfollowUser(this.authUser.id, this.user.id);
+                    this.isFollowingUser = false;
+                    this.followersCount--;
+                } else {
+                    await followUser(this.authUser.id, this.user.id);
+                    this.isFollowingUser = true;
+                    this.followersCount++;
+                }
+            },
         }
     }
 </script>
@@ -191,7 +215,10 @@
     </div>
     <template v-else>
         <div class="user">
-            <ExternalUserProfileData :user="user" />
+            <ExternalUserProfileData :user="user" 
+                :auth-user="authUser"
+                :show-follow="authUser.id && user.id && authUser.id !== user.id"
+            />
 
             <section>
                 <h2 class="m-auto mb-20 text-4xl w-fit mt-28">Actividad</h2>
@@ -225,7 +252,7 @@
 
 <style scoped>
     section {
-        margin-top: -450px;
+        margin-top: -550px;
         margin-left: 300px;
         padding: 0 5%;
     }
