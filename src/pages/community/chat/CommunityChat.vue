@@ -12,13 +12,13 @@
     components: { MainButton, Loader },
     data() {
       return {
-        authUser: { id: null, email: null, photoURL: null, displayName: null },
-        loadingUser: true,
-        messages: [],
-        loadingMessages: true,
-        communityId: this.$route.params.id,         // ID de la comunidad desde la ruta
-        editor: null,                               // Instancia del editor Quill
-        community: { name: null, photoURL: null },
+        authUser: { id: null, email: null, photoURL: null, displayName: null }, // Datos del usuario autenticado
+        loadingUser: true, // Indica si los datos del usuario están cargando
+        messages: [], // Lista de mensajes del chat
+        loadingMessages: true, // Indica si los mensajes están cargando
+        communityId: this.$route.params.id, // ID de la comunidad desde la ruta
+        editor: null, // Instancia del editor Quill
+        community: { name: null, photoURL: null }, // Datos de la comunidad
       };
     },
     methods: {
@@ -30,16 +30,16 @@
        * 4. Limpia el editor
        */
       sendMessage() {
-      // Obtener el contenido del editor Quill
-      const content = this.editor.root.innerHTML;
+        // Obtener el contenido del editor Quill
+        const content = this.editor.root.innerHTML;
 
-      // Eliminar etiquetas HTML y espacios en blanco
-      const strippedContent = content.replace(/<[^>]+>/g, '').trim();
+        // Eliminar etiquetas HTML y espacios en blanco para validar
+        const strippedContent = content.replace(/<[^>]+>/g, '').trim();
 
-      // Validar si el mensaje está vacío o solo contiene espacios
-      if (strippedContent === '') {
-        return;
-      }
+        // Validar si el mensaje está vacío o solo contiene espacios
+        if (strippedContent === '') {
+          return;
+        }
 
       // Enviar el mensaje si es válido
       saveCommunityChatMessage(this.communityId, {
@@ -51,12 +51,14 @@
       .then(doc => {
         console.log("Mensaje enviado, ID:", doc.id);
           // Vaciar el editor después de enviar
-        this.editor.root.innerHTML = ''; // Limpiar el contenido del editor
-      })
-      .catch(error => {
-        console.error("Error al enviar el mensaje:", error);
-      });
-    },
+          this.editor.root.innerHTML = ''; // Limpiar el contenido del editor
+        })
+        .catch(error => {
+          console.error("Error al enviar el mensaje:", error);
+        });
+      },
+      
+      // Formatea una fecha a formato local con hora
       formatDate(date) {
         return Intl.DateTimeFormat('es-AR', {
           year: 'numeric',
@@ -68,6 +70,7 @@
       },
     },
 
+    // Hook del ciclo de vida: se ejecuta cuando el componente se monta en el DOM
     mounted() {
       // Suscripción a mensajes del chat (actualización en tiempo real)
       this.unsubscribeFromMessages = subscribeToCommunityChatMessages(this.communityId, newMessages => {
@@ -75,30 +78,32 @@
         this.loadingMessages = false;
       });
 
-      // Suscripción a cambios de autenticación
+      // Suscripción a cambios de autenticación del usuario
       this.unsubscribeFromAuth = subscribeToAuth(newUserData => {
         this.authUser = newUserData;
         this.loadingUser = false;
       });
 
-      // Inicialización del editor Quill
+      // Inicialización del editor Quill después de que el DOM esté listo
       this.$nextTick(() => {
         if (this.$refs.editor) {
+          // Crea una nueva instancia del editor Quill
           this.editor = new Quill(this.$refs.editor, {
             theme: 'snow',
             placeholder: 'Escribe tu mensaje...',
             modules: {
-              toolbar: false, 
+              toolbar: false, // Sin barra de herramientas
               clipboard: {
-                matchVisual: false
+                matchVisual: false // No mantener formato visual al pegar
               }
             }
           });
-          // Elimina formatos al pegar contenido
+          
+          // Elimina formatos al pegar contenido (solo texto plano)
           this.editor.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
             delta.ops = delta.ops.map(op => {
               if (op.insert && typeof op.insert === 'string') {
-                return { insert: op.insert };           // Solo texto plano
+                return { insert: op.insert }; // Solo texto plano
               }
               return op;
             });
@@ -109,6 +114,7 @@
         }
       });
 
+      // Obtiene los datos de la comunidad
       getCommunityById(this.communityId)
         .then(data => {
           this.community = data;
@@ -118,10 +124,11 @@
         });
     },
 
-    // Limpieza al desmontar el componente
+    // Hook del ciclo de vida: se ejecuta antes de que el componente se desmonte del DOM
     unmounted() {
-      if (this.unsubscribeFromMessages) this.unsubscribeFromMessages();       // Cancela la suscripción a mensajes
-      if (this.unsubscribeFromAuth) this.unsubscribeFromAuth();       // Cancela la suscripción a auth
+      // Limpieza al desmontar el componente
+      if (this.unsubscribeFromMessages) this.unsubscribeFromMessages(); // Cancela la suscripción a mensajes
+      if (this.unsubscribeFromAuth) this.unsubscribeFromAuth(); // Cancela la suscripción a auth
     }
   };
 </script>

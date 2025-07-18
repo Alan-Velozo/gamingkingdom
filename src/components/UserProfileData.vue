@@ -116,7 +116,8 @@
         color: white;
         padding: .5rem 1rem;
         margin-bottom: 1rem;
-        width: fit-content;
+        width: 100%;
+        text-align: center;
     }
 
     .user-cta .edit-profile i,
@@ -137,6 +138,8 @@
     .user-data-list .user-username{
         font-size: 3.25rem;
         font-family: "Jersey 15", sans-serif;
+        line-height: 1;
+        padding-top: 2rem;
     }
 
     .user-data-list .user-email{

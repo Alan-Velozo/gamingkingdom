@@ -28,17 +28,17 @@
       };
     },
     computed: {
-      // Lista de categorías de publicaciones
+      // Devuelve la lista de categorías de publicaciones
       categoryList() {
         return categories;
       },
-      // Estilos de categorías (colores e íconos)
+      // Devuelve los estilos de las categorías (colores e íconos)
       categoryStyles() {
         return categoryStyles;
       },
     },
     methods: {
-      // Método para alternar la membresía del usuario en la comunidad
+      // Alterna la membresía del usuario en la comunidad
       async handleToggleMembership() {
         try {
           // Llama a la función para alternar la membresía
@@ -50,7 +50,7 @@
         }
       },
 
-      // Método para manejar la creación de una publicación
+      // Maneja la creación de una publicación
       handleCreatePost(postData) {
         // Agrega la información del usuario al post
         postData.user_id = this.authUser.id;
@@ -62,19 +62,19 @@
         // Guarda la publicación en Firestore
         savePost(postData)
           .then(() => {
-            
+            // Publicación creada exitosamente
           })
           .catch((error) => console.error("Error al crear post:", error));
       },
 
-      // Método para manejar la subida de una imagen de portada
+      // Maneja la subida de una imagen de portada
       handleUploadCover(file, callback) {
         uploadFileToStorage(file, `posts/cover/${file.name}`)
           .then((url) => callback(url)) // Retorna la URL de la imagen subida
           .catch((error) => console.error("Error al subir la portada:", error));
       },
 
-      // Método para alternar el estado de guardado de una publicación
+      // Alterna el estado de guardado de una publicación
       async toggleSave(postId) {
         try {
           // Llama a la función para alternar el estado de guardado
@@ -91,7 +91,7 @@
         }
       },
 
-      // Método para alternar el "like" de una publicación
+      // Alterna el "like" de una publicación
       async toggleLike(postId) {
         try {
           // Llama a la función para alternar el "like"
@@ -102,7 +102,7 @@
         }
       },
 
-      // Método para alternar el "dislike" de una publicación
+      // Alterna el "dislike" de una publicación
       async toggleDislike(postId) {
         try {
           // Llama a la función para alternar el "dislike"
@@ -113,19 +113,19 @@
         }
       },
 
-      // Método para verificar si el usuario dio "like" a una publicación
+      // Verifica si el usuario dio "like" a una publicación
       isLiked(postId) {
         const post = this.posts.find(p => p.id === postId);
         return post && post.likes && post.likes.includes(this.authUser.id);
       },
 
-      // Método para verificar si el usuario dio "dislike" a una publicación
+      // Verifica si el usuario dio "dislike" a una publicación
       isDisliked(postId) {
         const post = this.posts.find(p => p.id === postId);
         return post && post.dislikes && post.dislikes.includes(this.authUser.id);
       },
 
-      // Método para formatear una fecha
+      // Formatea una fecha a formato local
       formatDate(date) {
         return Intl.DateTimeFormat("es-AR", {
           year: "numeric",
@@ -134,21 +134,21 @@
         }).format(date).replace(",", "");
       },
 
-      // Método para navegar a la página de una publicación
+      // Navega a la página de detalle de una publicación
       goToPost(postId) {
         this.$router.push(`/post/${postId}`);
       },
 
-      // Método para actualizar los datos de una publicación
+      // Actualiza los datos de una publicación (likes y dislikes)
       async updatePost(postId) {
         const index = this.posts.findIndex(p => p.id === postId);
         if (index !== -1) {
-          // Obtiene los datos actualizados de la publicación (likes y dislikes)
+          // Obtiene los datos actualizados de la publicación
           this.posts[index] = await getLikesAndDislikes(postId);
         }
       },
 
-      // Método para suscribirse a los comentarios de una publicación
+      // Se suscribe a los comentarios de una publicación
       subscribeToPostComments(postId) {
         if (!this.comments[postId]) {
           this.comments[postId] = [];
@@ -158,10 +158,11 @@
         });
       },
     },
+    // Hook del ciclo de vida: se ejecuta cuando el componente se monta en el DOM
     async mounted() {
-      // Obtiene el ID de la comunidad desde la ruta
+      // Obtiene el ID de la comunidad desde los parámetros de la ruta
       const communityId = this.$route.params.id;
-      // Obtiene los datos de la comunidad
+      // Obtiene los datos de la comunidad desde Firestore
       this.community = await getCommunity(communityId);
 
       // Suscribe el componente a los cambios en la autenticación del usuario
@@ -182,7 +183,7 @@
         }
       });
 
-      // Suscribe el componente a los cambios en las publicaciones
+      // Suscribe el componente a los cambios en las publicaciones en tiempo real
       this.unsubscribeFromPosts = subscribeToPosts(newPosts => {
         // Filtra las publicaciones que pertenecen a la comunidad actual
         this.posts = newPosts.filter(post => post.communityId === this.community.id);
@@ -197,10 +198,12 @@
         });
       });
     },
+    // Hook del ciclo de vida: se ejecuta antes de que el componente se desmonte del DOM
     beforeUnmount() {
       // Cancela las suscripciones para evitar fugas de memoria
       if (this.unsubscribeFromAuth) this.unsubscribeFromAuth();
       if (this.unsubscribeFromPosts) this.unsubscribeFromPosts();
+      // Cancela las suscripciones de comentarios de cada publicación
       Object.keys(this.comments).forEach(postId => {
         if (this.comments[postId].unsubscribe) {
           this.comments[postId].unsubscribe();
@@ -347,7 +350,6 @@
     padding: 10px 20px;
     font-size: 1rem;
     cursor: pointer;
-    border-radius: 5px;
   }
   
   .join-button:hover {

@@ -139,7 +139,7 @@
         z-index: 99;
         position: relative;
         backdrop-filter: blur(15px);
-        border: 2px solid black;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
         gap: 5rem;
     }
 

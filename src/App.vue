@@ -129,7 +129,7 @@
                 <router-link to="/"><i class="fa-solid fa-house"></i></router-link>
               </li>
               <li>
-                <router-link to="/chat"><i class="fa-brands fa-rocketchat"></i></router-link>
+                <router-link to="/chat"><i class="fa-solid fa-comment-dots"></i></router-link>
               </li>
               <li>
                 <router-link to="/perfil"><i class="fa-solid fa-circle-user"></i></router-link>
@@ -303,17 +303,12 @@
   }
 
   .signup {
-    background: #EA5B27;
-    color: white;
+    background: white;
     border: none;
   }
 
   .login:hover {
     background: rgba(255, 255, 255, 0.1);
-  }
-
-  .signup:hover {
-    background: #633188;
   }
 
   @media (max-width: 1000px) {

@@ -14,25 +14,26 @@
               authUser: {
                   id: null,
                   email: null,
-              },
-              unsubscribeFromAuth: () => { },
+              }, // Datos del usuario autenticado
+              unsubscribeFromAuth: () => { }, // Función para cancelar suscripción de autenticación
 
               user: {
                   id: null,
                   email: null,
-              },
-              loadingUser: true,
+              }, // Datos del usuario con quien se está chateando
+              loadingUser: true, // Indica si los datos del usuario están cargando
 
-              messages: [],
-              loadingMessages: true,
-              unsubscribeFromMessages: () => { },
+              messages: [], // Lista de mensajes del chat privado
+              loadingMessages: true, // Indica si los mensajes están cargando
+              unsubscribeFromMessages: () => { }, // Función para cancelar suscripción de mensajes
               
               newMessage: {
-                  content: '',
+                  content: '', // Contenido del nuevo mensaje a enviar
               }
           };
       },
       methods: {
+        // Maneja el envío de un mensaje privado
         handleSubmit() {
           // Eliminar espacios en blanco al inicio y al final del mensaje
           const trimmedMessage = this.newMessage.content.trim();
@@ -43,6 +44,7 @@
           }
 
           try {
+            // Envía el mensaje privado usando el servicio
             sendPrivateChatMessage(this.authUser.id, this.user.id, trimmedMessage);
             this.newMessage.content = ''; // Limpiar el campo de mensaje
           } catch (error) {
@@ -50,6 +52,7 @@
           }
         },
           
+        // Formatea una fecha a formato local con hora
         formatDate(date) {
             return Intl.DateTimeFormat('es-AR', {
                 year: 'numeric', month: '2-digit', day: '2-digit',
@@ -58,22 +61,31 @@
         },
       },
       computed: {
+        // Verifica si el mensaje está vacío para deshabilitar el botón de envío
         isMessageEmpty() {
           return this.newMessage.content.trim() === '';
         }
       },
+      // Hook del ciclo de vida: se ejecuta cuando el componente se monta en el DOM
       async mounted() {
+          // Obtiene los datos del usuario con quien se está chateando
           getUserProfileById(this.$route.params.id).then((user) => {
               this.user = user;
               this.loadingUser = false;
           });
+          
+          // Suscribe el componente a los cambios en la autenticación del usuario
           this.unsubscribeFromAuth = subscribeToAuth(newUserData => this.authUser = newUserData);
+          
+          // Suscribe el componente a los mensajes del chat privado en tiempo real
           this.unsubscribeFromMessages = subscribeToPrivateChat(this.authUser.id, this.$route.params.id, newMessages => {
               this.messages = newMessages;
               this.loadingMessages = false;
           });
       },
+      // Hook del ciclo de vida: se ejecuta antes de que el componente se desmonte del DOM
       unmounted() {
+          // Cancela las suscripciones para evitar fugas de memoria
           this.unsubscribeFromAuth();
           this.unsubscribeFromMessages();
       },

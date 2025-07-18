@@ -18,52 +18,58 @@
                     bio: null,
                     photoURL: null,
                     fullyLoaded: false,
-                },
-                posts: [],
-                userLoaded: false,
-                loadingPosts: true, // Añadir estado de carga para los posts
-                unsubscribePosts: () => {}, // Añadir referencia para desuscripción
-                comments: {},
-                newCommentContent: {},
-                unsubscribeFromAuth: () => {},
-                unsubscribeComments: () => {},
-                savedPosts: [],
+                }, // Datos del usuario cuyo perfil se está viendo
+                posts: [], // Lista de todas las publicaciones
+                userLoaded: false, // Indica si los datos del usuario están cargados
+                loadingPosts: true, // Indica si las publicaciones están cargando
+                unsubscribePosts: () => {}, // Función para cancelar suscripción de posts
+                comments: {}, // Comentarios organizados por ID de publicación
+                newCommentContent: {}, // Contenido de nuevos comentarios
+                unsubscribeFromAuth: () => {}, // Función para cancelar suscripción de autenticación
+                unsubscribeComments: () => {}, // Función para cancelar suscripción de comentarios
+                savedPosts: [], // Lista de publicaciones guardadas por el usuario autenticado
             }
         },
         computed: {
+            // Filtra las publicaciones que pertenecen al usuario del perfil
             userPosts() {
                 return this.posts.filter(post => post.user_id === this.user.id);
             },
+            // Devuelve la lista de categorías disponibles
             categoryList() {
                 return categories;
             },
+            // Devuelve los estilos de las categorías
             categoryStyles() {
                 return categoryStyles;
             },
         },
+        // Hook del ciclo de vida: se ejecuta cuando el componente se monta en el DOM
         async mounted() {
             this.userLoaded = false;
 
-            // Obtener usuario autenticado
+            // Obtener usuario autenticado y suscribirse a cambios
             this.unsubscribeFromAuth = subscribeToAuth(user => {
                 this.authUser = user;
             });
 
+            // Obtener las publicaciones guardadas del usuario autenticado
             if (this.authUser.id) {
                 this.savedPosts = await getSavedPosts(this.authUser.id);
             }
 
-            // Obtener datos del perfil del usuario
+            // Obtener datos del perfil del usuario desde la ruta
             this.user = await getUserProfileById(this.$route.params.id);
             this.userLoaded = true;
 
             console.log(this.user);
 
+            // Suscribirse a las publicaciones en tiempo real
             this.unsubscribeFromPosts = subscribeToPosts(newPosts => {
                 this.posts = newPosts;
                 this.loadingPosts = false;
 
-                // Suscribirse a los comentarios de cada post
+                // Suscribirse a los comentarios de cada publicación
                 newPosts.forEach(post => {
                     if (!this.unsubscribeComments[post.id]) {
                         this.unsubscribeComments[post.id] = this.subscribeToPostComments(post.id);
@@ -72,27 +78,32 @@
             });
         },
 
+        // Hook del ciclo de vida: se ejecuta antes de que el componente se desmonte del DOM
         beforeUnmount() {
+            // Cancela las suscripciones para evitar fugas de memoria
             if (this.unsubscribeFromPosts) this.unsubscribeFromPosts();
             if (this.unsubscribeFromAuth) this.unsubscribeFromAuth();
             
-            // Desuscribirse de los comentarios de cada post
+            // Desuscribirse de los comentarios de cada publicación
             Object.values(this.unsubscribeComments).forEach(unsub => {
                 if (typeof unsub === "function") unsub();
             });
         },
 
         methods: {
+            // Formatea una fecha a formato local
             formatDate(date) {
                 return Intl.DateTimeFormat('es-AR', {
                     year: 'numeric', month: '2-digit', day: '2-digit',
                 }).format(date).replace(',', '');
             },
 
+            // Navega a la página de detalle de una publicación
             goToPost(postId) {
                 this.$router.push(`/post/${postId}`);
             },
 
+            // Se suscribe a los comentarios de una publicación específica
             subscribeToPostComments(postId) {
                 if (!this.comments[postId]) {
                     this.comments[postId] = [];
@@ -102,21 +113,23 @@
                 });
             },
 
+            // Alterna el estado de guardado de una publicación
             async toggleSave(postId) {
                 try {
                     const isPostSaved = await toggleSavePost(this.authUser.id, postId);
                     if (isPostSaved) {
-                    // Si el post se guardó, lo agregamos a la lista de guardados
-                    this.savedPosts.push(postId);
+                        // Si el post se guardó, lo agregamos a la lista de guardados
+                        this.savedPosts.push(postId);
                     } else {
-                    // Si el post se eliminó, lo quitamos de la lista de guardados
-                    this.savedPosts = this.savedPosts.filter(id => id !== postId);
+                        // Si el post se eliminó, lo quitamos de la lista de guardados
+                        this.savedPosts = this.savedPosts.filter(id => id !== postId);
                     }
                 } catch (error) {
                     console.error("Error al alternar el estado de guardado:", error);
                 }
             },
 
+            // Alterna el "like" de una publicación
             async toggleLike(postId) {
                 try {
                     const post = this.posts.find(p => p.id === postId);
@@ -132,6 +145,7 @@
                 }
             },
 
+            // Alterna el "dislike" de una publicación
             async toggleDislike(postId) {
                 try {
                     const post = this.posts.find(p => p.id === postId);
@@ -147,16 +161,19 @@
                 }
             },
 
+            // Verifica si el usuario autenticado dio "like" a una publicación
             isLiked(postId) {
                 const post = this.posts.find(p => p.id === postId);
                 return post && Array.isArray(post.likes) && post.likes.includes(this.authUser?.id);
             },
             
+            // Verifica si el usuario autenticado dio "dislike" a una publicación
             isDisliked(postId) {
                 const post = this.posts.find(p => p.id === postId);
                 return post && Array.isArray(post.dislikes) && post.dislikes.includes(this.authUser?.id);
             },
 
+            // Actualiza los datos de una publicación (likes y dislikes)
             async updatePost(postId) {
                 const postIndex = this.posts.findIndex(p => p.id === postId);
                 if (postIndex !== -1) {
@@ -208,7 +225,7 @@
 
 <style scoped>
     section {
-        margin-top: -400px;
+        margin-top: -450px;
         margin-left: 300px;
         padding: 0 5%;
     }

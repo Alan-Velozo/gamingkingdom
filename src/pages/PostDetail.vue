@@ -4,6 +4,7 @@
   import { ref, onMounted, onBeforeUnmount } from 'vue'; // Reactividad y ciclos de vida
   import Loader from "../components/Loader.vue";
 
+  // Importa el editor de texto enriquecido Quill
   import Quill from 'quill';
   import 'quill/dist/quill.snow.css';
 
@@ -13,17 +14,18 @@
       return {
         post: null, // El post que se mostrará
         comments: [], // Los comentarios del post
-        newComment: '', // Estado reactivo para el comentario
+        newComment: '', // Contenido del nuevo comentario
         postId: this.$route.params.id, // Obtener el ID del post desde la ruta
         authUser: null, // Datos del usuario autenticado
-        unsubscribeAuth: null, // Para limpiar suscripciones
-        commentEditor: null,
-        isImage: true,
-        isSaved: false,
-        loading: true,
+        unsubscribeAuth: null, // Para limpiar suscripciones de autenticación
+        commentEditor: null, // Instancia del editor Quill para comentarios
+        isImage: true, // Indica si el contenido es una imagen o video
+        isSaved: false, // Indica si el post está guardado por el usuario
+        loading: true, // Indica si los datos están cargando
       };
     },
     methods: {
+      // Formatea una fecha a formato local
       formatDate(date) {
         return Intl.DateTimeFormat('es-AR', {
           year: 'numeric',
@@ -31,6 +33,8 @@
           day: '2-digit',
         }).format(date).replace(',', '');
       },
+      
+      // Obtiene el post específico desde la lista de posts
       fetchPost() {
         subscribeToPosts((posts) => {
           const foundPost = posts.find((post) => post.id === this.postId); // Buscar el post por ID
@@ -40,14 +44,18 @@
           }
         });
       },
+      
+      // Obtiene los comentarios del post en tiempo real
       fetchComments() {
         subscribeToComments(this.postId, (comments) => {
           this.comments = comments; // Actualizamos los comentarios
           this.loading = false;
         });
       },
+      
+      // Envía un nuevo comentario
       submitComment() {
-        // Eliminar etiquetas HTML y espacios en blanco
+        // Eliminar etiquetas HTML y espacios en blanco para validar
         const strippedContent = this.newComment.replace(/<[^>]+>/g, '').trim();
 
         // Validar si el comentario está vacío o solo contiene espacios
@@ -55,6 +63,7 @@
           return;
         }
 
+        // Crear objeto del comentario con datos del usuario
         const comment = {
           user_id: this.authUser.id,
           email: this.authUser.email,
@@ -63,6 +72,7 @@
           photoURL: this.authUser.photoURL, // URL del avatar del usuario
         };
 
+        // Guardar el comentario y limpiar el editor
         saveComment(this.postId, comment).then(() => {
           // Limpiar el editor Quill
           if (this.commentEditor) {
@@ -72,6 +82,7 @@
         });
       },
 
+      // Alterna el estado de guardado del post
       async toggleSave() {
         try {
           const isNowSaved = await toggleSavePost(this.authUser.id, this.postId);
@@ -81,6 +92,7 @@
         }
       },
 
+      // Verifica si el post está guardado por el usuario
       async checkIfPostIsSaved() {
         if (this.authUser && this.postId) {
           try {
@@ -91,6 +103,8 @@
           }
         }
       },
+      
+      // Alterna el "like" del post
       async toggleLike() {
         try {
           await toggleReaction(this.postId, "like", this.authUser.id);
@@ -99,6 +113,8 @@
           console.error("Error al dar like", error);
         }
       },
+      
+      // Alterna el "dislike" del post
       async toggleDislike() {
         try {
           await toggleReaction(this.postId, "dislike", this.authUser.id);
@@ -107,12 +123,18 @@
           console.error("Error al dar dislike", error);
         }
       },
+      
+      // Verifica si el usuario dio "like" al post
       isLiked() {
         return this.post && this.post.likes && this.post.likes.includes(this.authUser.id);
       },
+      
+      // Verifica si el usuario dio "dislike" al post
       isDisliked() {
         return this.post && this.post.dislikes && this.post.dislikes.includes(this.authUser.id);
       },
+      
+      // Actualiza los datos del post (likes y dislikes)
       async updatePost() {
         // Actualiza solo los likes/dislikes del post
         const updated = await getLikesAndDislikes(this.postId);
@@ -121,6 +143,8 @@
           this.post.dislikes = updated.dislikes;
         }
       },
+      
+      // Alterna el "like" de un comentario
       async toggleCommentLike(comment) {
         try {
           await toggleCommentReaction(this.postId, comment.id, "like", this.authUser.id);
@@ -128,6 +152,8 @@
           console.error("Error al dar like al comentario:", error);
         }
       },
+      
+      // Alterna el "dislike" de un comentario
       async toggleCommentDislike(comment) {
         try {
           await toggleCommentReaction(this.postId, comment.id, "dislike", this.authUser.id);
@@ -135,13 +161,18 @@
           console.error("Error al dar dislike al comentario:", error);
         }
       },
+      
+      // Verifica si el usuario dio "like" a un comentario
       isCommentLiked(comment) {
         return comment.likes && comment.likes.includes(this.authUser.id);
       },
+      
+      // Verifica si el usuario dio "dislike" a un comentario
       isCommentDisliked(comment) {
         return comment.dislikes && comment.dislikes.includes(this.authUser.id);
       },
 
+      // Maneja errores de carga de imagen
       onImageError() {
         // Si ocurre un error al cargar la imagen, asumimos que no es una imagen y mostramos video
         this.isImage = false;
@@ -149,11 +180,14 @@
     },
 
     computed: {
+      // Verifica si el comentario está vacío para deshabilitar el botón de envío
       isCommentEmpty() {
         const strippedContent = this.newComment.replace(/<[^>]+>/g, '').trim();
         return strippedContent === '';
       }
     },
+    
+    // Hook del ciclo de vida: se ejecuta cuando el componente se monta en el DOM
     mounted() {
       // Suscribir al usuario autenticado
       this.unsubscribeAuth = subscribeToAuth((newUserData) => {
@@ -165,10 +199,11 @@
       this.fetchPost();
       this.fetchComments();
 
-      // Inicializar Quill para los comentarios
+      // Inicializar Quill para los comentarios después de que el DOM esté listo
       this.$nextTick(() => {
         const commentContainer = this.$refs.commentEditor;
         if (commentContainer) {
+          // Crea una nueva instancia del editor Quill
           this.commentEditor = new Quill(commentContainer, {
             theme: 'snow',
             placeholder: 'Escribe un comentario...',
@@ -183,10 +218,13 @@
               },
             },
           });
+          
+          // Escucha cambios en el editor para actualizar newComment
           this.commentEditor.on('text-change', () => {
             this.newComment = this.commentEditor.root.innerHTML;
           });
-          // Agregar matcher para eliminar formatos al pegar (dejando solo texto)
+          
+          // Elimina formatos al pegar contenido (solo texto plano)
           this.commentEditor.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
             delta.ops = delta.ops.map(op => {
               if (op.insert && typeof op.insert === 'string') {
@@ -201,6 +239,8 @@
         }
       });
     },
+    
+    // Hook del ciclo de vida: se ejecuta antes de que el componente se desmonte del DOM
     beforeUnmount() {
       // Limpiar las suscripciones para evitar fugas de memoria
       if (this.unsubscribeAuth) this.unsubscribeAuth();

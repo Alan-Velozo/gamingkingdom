@@ -64,18 +64,6 @@ function calculateChatId(id1, id2) {
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 export async function getPrivateChats(userId) {
     const chatsRef = collection(db, "private-chats");
     const q = query(chatsRef, where(userId, "==", true));

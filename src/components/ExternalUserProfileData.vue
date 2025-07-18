@@ -106,6 +106,8 @@
         background: #1D71B8;
         color: white;
         padding: .5rem 1rem;
+        width: 100%;
+        text-align: center;
     }
 
     .user-cta .message-profile i{
@@ -121,6 +123,8 @@
     .user-data-list .user-username {
         font-size: 3.5rem;
         font-family: "Jersey 15", sans-serif;
+        line-height: 1;
+        padding-top: 2rem;
     }
 
     .user-data-list .user-email {

@@ -20,35 +20,41 @@
                     photoURL: null,
                     bannerURL: null,
                     fullyLoaded: false,
-                },
-                posts: [],
-                savedPostIds: [],
-                comments: {},
-                newCommentContent: {},
-                loadingPosts: true, // Añadir estado de carga para los posts
-                loadingSavedPosts: true,
-                activeTab: 'my-activity',
-                unsubscribeFromAuth: () => {},
-                unsubscribePosts: () => {}, // Añadir referencia para desuscripción
-                unsubscribeComments: () => {}
+                }, // Datos del usuario autenticado
+                posts: [], // Lista de todas las publicaciones
+                savedPostIds: [], // IDs de las publicaciones guardadas por el usuario
+                comments: {}, // Comentarios organizados por ID de publicación
+                newCommentContent: {}, // Contenido de nuevos comentarios
+                loadingPosts: true, // Indica si las publicaciones están cargando
+                loadingSavedPosts: true, // Indica si los posts guardados están cargando
+                activeTab: 'my-activity', // Pestaña activa (mi actividad o guardados)
+                unsubscribeFromAuth: () => {}, // Función para cancelar suscripción de autenticación
+                unsubscribePosts: () => {}, // Función para cancelar suscripción de posts
+                unsubscribeComments: () => {} // Función para cancelar suscripción de comentarios
             }
         },
         computed: {
+            // Filtra las publicaciones que pertenecen al usuario autenticado
             userPosts() {
                 return this.posts.filter(post => post.user_id === this.authUser.id);
             },
+            // Devuelve la lista de categorías disponibles
             categoryList() {
                 return categories;
             },
+            // Devuelve los estilos de las categorías
             categoryStyles() {
                 return categoryStyles;
             },
+            // Filtra las publicaciones que están en la lista de guardados
             savedPosts() {
-                // Filtrar los posts que están en la lista de guardados
                 return this.posts.filter(post => this.savedPostIds.includes(post.id));
             },
         },
+        
+        // Hook del ciclo de vida: se ejecuta cuando el componente se monta en el DOM
         async mounted() {
+            // Suscribe el componente a los cambios en la autenticación del usuario
             this.unsubscribeFromAuth = subscribeToAuth(async (newUserData) => {
                 this.authUser = newUserData;
                 this.authUser.fullyLoaded = true;
@@ -65,9 +71,12 @@
                 }
             });
 
+            // Suscribe el componente a las publicaciones en tiempo real
             this.unsubscribePosts = subscribeToPosts(newPosts => {
                 this.posts = newPosts;
                 this.loadingPosts = false;
+                
+                // Suscribe el componente a los comentarios de cada publicación
                 newPosts.forEach(post => {
                     if (!this.comments[post.id]) {
                         this.comments[post.id] = [];
@@ -76,21 +85,31 @@
                 });
             });
         },
+        
+        // Hook del ciclo de vida: se ejecuta antes de que el componente se desmonte del DOM
         unmounted() {
+            // Cancela las suscripciones para evitar fugas de memoria
             this.unsubscribeFromAuth();
             this.unsubscribePosts(); // Asegurarse de desuscribirse de los posts
 
+            // Cancela las suscripciones de comentarios de cada publicación
             Object.values(this.unsubscribeComments).forEach(unsub => unsub());
         },
+        
         methods: {
+            // Formatea una fecha a formato local
             formatDate(date) {
                 return Intl.DateTimeFormat('es-AR', {
                     year: 'numeric', month: '2-digit', day: '2-digit',
                 }).format(date).replace(',', '');
             },
+            
+            // Navega a la página de detalle de una publicación
             goToPost(postId) {
                 this.$router.push(`/post/${postId}`);
             },
+            
+            // Se suscribe a los comentarios de una publicación específica
             subscribeToPostComments(postId) {
                 if (!this.comments[postId]) {
                     this.comments[postId] = [];
@@ -100,6 +119,7 @@
                 });
             },
 
+            // Alterna el "like" de una publicación
             async toggleLike(postId) {
                 try {
                     const post = this.posts.find(p => p.id === postId);
@@ -115,6 +135,7 @@
                 }
             },
 
+            // Alterna el "dislike" de una publicación
             async toggleDislike(postId) {
                 try {
                     const post = this.posts.find(p => p.id === postId);
@@ -129,25 +150,31 @@
                     console.error("Error al dar dislike", error);
                 }
             },
+            
+            // Verifica si el usuario dio "like" a una publicación
             isLiked(postId) {
                 const post = this.posts.find(p => p.id === postId);
                 return post && Array.isArray(post.likes) && post.likes.includes(this.authUser.id);
             },
+            
+            // Verifica si el usuario dio "dislike" a una publicación
             isDisliked(postId) {
                 const post = this.posts.find(p => p.id === postId);
                 return post && Array.isArray(post.dislikes) && post.dislikes.includes(this.authUser.id);
             },
 
+            // Alterna el estado de guardado de una publicación
             async toggleSave(postId) {
-                
                 try {
                     const isNowSaved = await toggleSavePost(this.authUser.id, postId);
 
                     if (isNowSaved) {
+                        // Si el post se guardó, lo agrega a la lista de guardados
                         if (!this.savedPostIds.includes(postId)) {
                             this.savedPostIds.push(postId);
                         }
                     } else {
+                        // Si el post se eliminó, lo quita de la lista de guardados
                         this.savedPostIds = this.savedPostIds.filter(id => id !== postId);
                     }
 
@@ -156,6 +183,7 @@
                 }
             },
 
+            // Actualiza los datos de una publicación (likes y dislikes)
             async updatePost(postId) {
                 try {
                     const updatedPost = await getLikesAndDislikes(postId);
@@ -260,7 +288,7 @@
 
 <style scoped>
     section {
-        margin-top: -400px;
+        margin-top: -450px;
         margin-left: 300px;
         padding: 0 5%;
     }

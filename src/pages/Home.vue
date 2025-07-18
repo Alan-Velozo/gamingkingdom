@@ -211,12 +211,12 @@
                         <h1>Bienvenidos a <br/>GamingKingdom</h1>
                         <p>Entra en el reino de los videojuegos donde la pasión, la comunidad y la aventura se encuentran. Únete a nosotros para compartir tus experiencias, descubrir nuevos juegos y conectar con jugadores de todo el mundo.</p>
                         <div class="banner-cta">
-                            <a class="login-cta">
-                                <router-link to="/iniciar-sesion">Iniciar sesión</router-link>
-                            </a>
-                            <a class="register-cta">
-                                <router-link to="/registro">Registrarse</router-link>
-                            </a>
+                            <button class="login-cta" @click="$router.push('/iniciar-sesion')">
+                                Iniciar sesión
+                            </button>
+                            <button class="register-cta" @click="$router.push('/registro')">
+                                Registrarse
+                            </button>
                         </div>
                     </div>
 
@@ -366,7 +366,8 @@
     .banner .banner-content .banner-1 .banner-cta .login-cta,
     .banner .banner-content .banner-1 .banner-cta .register-cta{
         padding: 1rem 2rem;
-        border: 1px solid black;
+        color: white;
+        border-radius: 100px;
     }
 
     .banner .banner-content .banner-1 .banner-cta .login-cta a,
@@ -380,9 +381,10 @@
     }
 
     .banner .banner-content .banner-1 .banner-cta .login-cta:hover{
-        background: #831b1e;
-        transition-property: background;
+        background: #9b2024;
+        transition-property: background, border;
         transition-duration: .5s;
+        border: 1px solid black;
     }
 
     .banner .banner-content .banner-1 .banner-cta .register-cta{
@@ -392,9 +394,10 @@
 
     
     .banner .banner-content .banner-1 .banner-cta .register-cta:hover{
-        background: #084c7c;
-        transition-property: background;
+        background: #0a5f9c;
+        transition-property: background, border;
         transition-duration: .5s;
+        border: 1px solid black;
     }
 
     @media screen and (max-width: 1340px) {

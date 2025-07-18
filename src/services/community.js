@@ -1,7 +1,6 @@
 import { 
     getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, getDoc 
 } from "firebase/firestore";
-import { uploadFileToStorage } from "./storage";
 import { getFileURL, uploadFile } from "./file-storage";
 import { getExtensionFromFile } from "../libraries/file";
 import { db } from "./firebase";
@@ -101,11 +100,6 @@ export async function getCommunity(id) {
 }
 
 
-
-
-
-
-
 // Función para buscar comunidades por nombre
 export async function searchCommunities(searchQuery) {
     
@@ -131,27 +125,6 @@ export async function searchCommunities(searchQuery) {
         return [];
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Función para alternar la membresía de un usuario en una comunidad
 export async function toggleCommunityMembership(userId, communityId) {
@@ -269,11 +242,7 @@ export async function getUserCommunities(userId) {
   }
 }
 
-
-
-
-
-
+// Función para obtener los datos de una comunidad por su ID
 export const getCommunityById = async (id) => {
     const docRef = doc(db, 'communities', id);
     const docSnap = await getDoc(docRef);
@@ -283,36 +252,3 @@ export const getCommunityById = async (id) => {
       throw new Error('Comunidad no encontrada');
     }
   };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// export async function getUserCommunities(userId) {
-//   try {
-//     const userRef = doc(db, "users", userId);
-//     const userSnap = await getDoc(userRef);
-
-//     if (userSnap.exists()) {
-//       return userSnap.data().communities || []; 
-//     }
-//     return []; 
-//   } catch (error) {
-//     console.error("Error al obtener las comunidades del usuario:", error);
-//     return [];
-//   }
-// }

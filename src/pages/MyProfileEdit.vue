@@ -14,31 +14,32 @@
                     bio: "",
                     photoURL: null,
                     bannerURL: null
-                },
-                unsubscribeFromAuth: () => {},      // Función para desuscribirse de cambios de autenticación
-                profileData: {      // Datos del perfil en edición
+                }, // Datos del usuario autenticado
+                unsubscribeFromAuth: () => {}, // Función para desuscribirse de cambios de autenticación
+                profileData: { // Datos del perfil en edición
                     displayName: "",
                     bio: "",
                 },
-                photo: null,
-                banner: null,
-                photoPreview: null,     // URL de vista previa de la nueva foto
-                bannerPreview: null,
-                editingProfile: false,      // Indicar si el perfil está en proceso de edición
-                uploadingPhoto: false,      // Indicar si la foto está en proceso de carga
-                uploadingBanner: false,
+                photo: null, // Archivo de foto seleccionado
+                banner: null, // Archivo de banner seleccionado
+                photoPreview: null, // URL de vista previa de la nueva foto
+                bannerPreview: null, // URL de vista previa del nuevo banner
+                editingProfile: false, // Indicar si el perfil está en proceso de edición
+                uploadingPhoto: false, // Indicar si la foto está en proceso de carga
+                uploadingBanner: false, // Indicar si el banner está en proceso de carga
 
-                photoSizeError: "",
-                bannerSizeError: "",
+                photoSizeError: "", // Error de tamaño para la foto
+                bannerSizeError: "", // Error de tamaño para el banner
 
-                favoriteGameSearch: '',
-                favoriteGameResults: [],
-                favoriteGameSelected: null,
-                favoriteGameLoading: false,
-                searchTimeout: null,
+                favoriteGameSearch: '', // Término de búsqueda para juegos favoritos
+                favoriteGameResults: [], // Resultados de la búsqueda de juegos
+                favoriteGameSelected: null, // Juego favorito seleccionado
+                favoriteGameLoading: false, // Estado de carga de la búsqueda
+                searchTimeout: null, // Timeout para evitar búsquedas excesivas
             }
         },
         watch: {
+            // Observa cambios en el campo de búsqueda de juegos favoritos
             favoriteGameSearch(newValue) {
                 clearTimeout(this.searchTimeout);
                 if (newValue.trim().length < 2) {
@@ -46,21 +47,23 @@
                     return;
                 }
 
+                // Implementa un debounce de 300ms para evitar spamear la API
                 this.searchTimeout = setTimeout(() => {
                     this.searchFavoriteGames(newValue);
                 }, 300); // Espera 300ms para evitar spamear la API
             }
         },
         methods: {
+            // Maneja el envío del formulario de edición de perfil
             async handleSubmit() {
                 this.editingProfile = true;     // Indicar que el perfil está siendo editado
                 try {
-
+                    // Validación de biografía - si está vacía, asigna un valor por defecto
                     if (!this.profileData.bio || !this.profileData.bio.trim()) {
                         this.profileData.bio = "Sin biografía.";
                     }
 
-                    // Actualiza el nombre y la biografía del usuario
+                    // Actualiza el nombre, biografía y juego favorito del usuario
                     await updateUser({
                         displayName: this.profileData.displayName,
                         bio: this.profileData.bio,
@@ -70,14 +73,16 @@
                     // Si se seleccionó una nueva foto, se actualiza la foto del perfil
                     if (this.photo && !this.photoSizeError) {
                         await updateUserPhoto(this.photo);
-                        this.authUser.photoURL = this.photoPreview;     // Actualiza la URL de la foto del usuario
+                        this.authUser.photoURL = this.photoPreview; // Actualiza la URL de la foto del usuario
                     }
 
+                    // Si se seleccionó un nuevo banner, se actualiza el banner
                     if (this.banner && !this.bannerSizeError) {
                         await updateUserBanner(this.banner);
-                        this.authUser.bannerURL = this.bannerPreview;     // Actualiza la URL de la foto del usuario
+                        this.authUser.bannerURL = this.bannerPreview; // Actualiza la URL del banner del usuario
                     }
 
+                    // Redirige al perfil después de la edición exitosa
                     this.$router.push(`/perfil`);
                     
                     
@@ -86,6 +91,8 @@
                 }
                 this.editingProfile = false;        // Indicar que la edición del perfil terminó
             },
+            
+            // Maneja la selección de archivos (foto y banner)
             handleFileSelection(event) {
                 const file = event.target.files[0]; // Obtener el archivo seleccionado
                 if (!file) return;
@@ -93,6 +100,7 @@
                 // Definir tamaño máximo: 20MB
                 const maxSize = 20 * 1024 * 1024;
 
+                // Validar el tamaño del archivo
                 if (file.size > maxSize) {
                     if (event.target.id === "photo") {
                         this.photoSizeError = "El archivo es demasiado pesado (máximo 20MB).";
@@ -101,7 +109,7 @@
                     }
                     return;
                 } else {
-                // Limpiar error si el archivo cumple el tamaño
+                    // Limpiar error si el archivo cumple el tamaño
                     if (event.target.id === "photo") {
                         this.photoSizeError = "";
                     } else if (event.target.id === "banner") {
@@ -109,6 +117,7 @@
                     }
                 }
 
+                // Crear vista previa del archivo seleccionado
                 const reader = new FileReader();
                 reader.addEventListener('load', () => {
                     if (event.target.id === "photo") {
@@ -123,6 +132,7 @@
                 reader.readAsDataURL(file);
             },
 
+            // Busca juegos en la API de RAWG basado en el término de búsqueda
             async searchFavoriteGames(query) {
                 this.favoriteGameLoading = true;
                 try {
@@ -135,25 +145,32 @@
                     this.favoriteGameLoading = false;
                 }
             },
+            
+            // Selecciona un juego de la lista de resultados
             async selectFavoriteGame(game) {
                 this.favoriteGameSelected = {
                     id: game.id,
                     name: game.name
                 };
-                this.favoriteGameResults = [];
-                this.favoriteGameSearch = game.name;
+                this.favoriteGameResults = []; // Limpia la lista de resultados
+                this.favoriteGameSearch = game.name; // Completa el campo de búsqueda
             }
             
         },
+        
+        // Hook del ciclo de vida: se ejecuta cuando el componente se monta en el DOM
         mounted() {
+            // Suscribe el componente a los cambios en la autenticación del usuario
             this.unsubscribeFromAuth = subscribeToAuth(newUserData => {
-                this.authUser = newUserData;        // Actualizar los datos del usuario autenticado
+                this.authUser = newUserData; // Actualizar los datos del usuario autenticado
                 this.profileData.displayName = this.authUser.displayName;
                 this.profileData.bio = this.authUser.bio;
                 this.photoPreview = this.authUser.photoURL || '/assets/users/user.png';
                 this.bannerPreview = this.authUser.bannerURL || '/assets/users/banner.png'
             });
         },
+        
+        // Hook del ciclo de vida: se ejecuta antes de que el componente se desmonte del DOM
         unmounted() {
             // Desuscribirse de los cambios de autenticación cuando el componente se desmonta
             this.unsubscribeFromAuth();
@@ -230,26 +247,29 @@
                 </div>
             </div>
 
-            <div class="favorite-videogame">
-                <label class="block font-semibold mb-1">Videojuego favorito</label>
-                <input type="text" v-model="favoriteGameSearch" placeholder="Escribe tu juego favorito..."/>
+            <div>
+                <div class="favorite-videogame">
+                    <label class="mb-1">Videojuego favorito</label>
+                    <input type="text" v-model="favoriteGameSearch" placeholder="Escribe tu juego favorito..."/>
 
-                <ul v-if="favoriteGameResults.length > 0" class="border bg-white shadow">
-                    <li
-                    v-for="game in favoriteGameResults"
-                    :key="game.id"
-                    class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                    @click="selectFavoriteGame(game)"
-                    >
-                    {{ game.name }}
-                    </li>
-                </ul>
+                    <ul v-if="favoriteGameResults.length > 0" class="border bg-white shadow">
+                        <li
+                        v-for="game in favoriteGameResults"
+                        :key="game.id"
+                        class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                        @click="selectFavoriteGame(game)"
+                        >
+                        {{ game.name }}
+                        </li>
+                    </ul>
+                </div>
 
+                <button type="submit">
+                    {{ editingProfile ? 'Cargando...' : 'Editar' }}
+                </button>
             </div>
 
-            <button type="submit">
-                {{ editingProfile ? 'Cargando...' : 'Editar' }}
-            </button>
+    
         </form>
     </div>
 </template> 
@@ -330,20 +350,25 @@
         background: #0d76bc;
         padding: 10px 0;
         color: white;
+        width: 45%;
         font-family: "Jersey 15", sans-serif;
         font-size: 2.5rem;
         margin-top: 50px;
     }
 
     form button:hover{
-        background: #084f7e;
-        transition-property: background;
-        transition-duration: .5s
+        background: #0b6bac;
+        border: 2px solid black;
+        transition-property: background, border;
+        transition-duration: .25s
     }
 
+    form div:last-of-type{
+        display: flex;
+    }
+    
     form .favorite-videogame{
         display: flex;
-        flex-direction: column;
         padding: 2rem 0 0 0;
     }
 

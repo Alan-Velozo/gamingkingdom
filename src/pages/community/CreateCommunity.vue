@@ -71,13 +71,7 @@
                 if (type === "banner") this.bannerFile = file;
             },
 
-             /**
-             * Método para crear una nueva comunidad
-             * 1. Valida que existan los archivos requeridos
-             * 2. Crea la comunidad (sin imágenes)
-             * 3. Sube las imágenes por separado
-             * 4. Redirige a la página de la comunidad creada
-             */
+            // Crea una nueva comunidad
             async createCommunity() {
 
                 // Validación de archivos requeridos
@@ -270,6 +264,7 @@
         font-family: "Jersey 15", sans-serif;
         font-size: 2.5rem;
         margin-top: 50px;
+        width: 45%;
     }
 
     form button:hover{

@@ -186,9 +186,7 @@ export async function updateUserBanner(banner) {
     }
 }
 
-
-
-
+// Función para actualizar el juego favorito del usuario
 export async function updateUserFavoriteGame(favoriteGame) {
     try {
       // Actualiza Firestore
@@ -201,9 +199,6 @@ export async function updateUserFavoriteGame(favoriteGame) {
       throw error;
     }
 }
-  
-
-
 
 export function logout() {
 
