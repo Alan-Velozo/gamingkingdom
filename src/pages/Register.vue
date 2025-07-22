@@ -392,6 +392,8 @@
     @media screen and (max-width: 1023px) {
         h1{
             width: auto;
+            text-align: center;
+            margin: auto;
         }
     }
 </style>
