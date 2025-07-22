@@ -43,11 +43,13 @@ onAuthStateChanged(auth, async user => {
         // Obtiene el perfil del usuario desde Firestore
         const userProfile = await getUserProfileById(user.uid);
 
-        // Actualiza los datos del usuario con la biografía y el banner
+        // Actualiza los datos del usuario con la biografía, banner, seguidores y seguidos
         setUserData({
             bio: userProfile.bio,
             bannerURL: userProfile.bannerURL || "",
             favoriteGame: userProfile.favoriteGame || null,
+            followers: userProfile.followers || [],
+            following: userProfile.following || [],
             fullyLoaded: true,              // Indica que los datos del usuario están completamente cargados
         });
     } else {
@@ -74,7 +76,15 @@ export async function register(email, password) {
         await updateProfile(user, { displayName: defaultDisplayName, photoURL: defaultPhotoURL });
 
         // Crea el perfil del usuario en Firestore
-        await createUserProfile(user.uid, { email, displayName: defaultDisplayName, photoURL: defaultPhotoURL, bannerURL: defaultBannerURL, favoriteGame: defaultFavoriteGame });
+        await createUserProfile(user.uid, { 
+            email, 
+            displayName: defaultDisplayName, 
+            photoURL: defaultPhotoURL, 
+            bannerURL: defaultBannerURL, 
+            favoriteGame: defaultFavoriteGame,
+            followers: [],
+            following: []
+        });
 
         // Actualiza los datos del usuario en el estado local
         setUserData({
@@ -242,4 +252,19 @@ function setUserData(newData) {
     localStorage.setItem('user', JSON.stringify(userData));
     // Notifica a todos los observadores con los datos actualizados
     notifyAll();        
+}
+
+// Función para forzar la recarga del usuario autenticado y notificar a todos los observadores
+export async function refreshAuthUser() {
+    if (userData.id) {
+        const userProfile = await getUserProfileById(userData.id);
+        setUserData({
+            bio: userProfile.bio,
+            bannerURL: userProfile.bannerURL || "",
+            favoriteGame: userProfile.favoriteGame || null,
+            followers: userProfile.followers || [],
+            following: userProfile.following || [],
+            fullyLoaded: true,
+        });
+    }
 }

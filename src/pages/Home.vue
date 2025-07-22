@@ -6,10 +6,11 @@
     import PostForm from '../components/PostForm.vue';
     import PostItem from '../components/PostItem.vue';
     import { getUserCommunities } from '../services/community';
+    import OrderDropdown from '../components/OrderDropdown.vue';
 
     export default {
     name: 'Home',
-    components: { PostForm, Loader, PostItem },
+    components: { PostForm, Loader, PostItem, OrderDropdown },
     data() {
         return {
 
@@ -27,6 +28,7 @@
             newCommentContent: {},      // Contenido de nuevos comentarios (no se usa en este código)
             savedPosts: [],             // Lista de publicaciones guardadas por el usuario
             userCommunities: [],        // Lista de comunidades a las que pertenece el usuario
+            orderBy: 'todos',
         };
     },
     computed: {
@@ -38,6 +40,18 @@
         // Estilos de categorías (colores e íconos)
         categoryStyles() {
             return categoryStyles;
+        },
+        categoryOptions() {
+            // Devuelve las categorías únicas, normalizadas y capitalizadas para mostrar
+            const cats = this.posts.map(p => (p.category || '').toLowerCase().trim()).filter(Boolean);
+            // Capitaliza la primera letra para mostrar bonito
+            return [...new Set(cats)].map(cat => cat.charAt(0).toUpperCase() + cat.slice(1)).sort();
+        },
+        filteredPosts() {
+            if (this.orderBy === 'todos') return this.posts;
+            if (this.orderBy === 'seguidos') return this.posts.filter(post => this.authUser.following && this.authUser.following.includes(post.user_id));
+            // Si orderBy es una categoría, compara normalizando
+            return this.posts.filter(post => (post.category || '').toLowerCase().trim() === this.orderBy.toLowerCase().trim());
         },
     },
     methods: {
@@ -150,6 +164,7 @@
         },
     },
     mounted() {
+
         // Suscribe el componente a los cambios en la autenticación del usuario
         this.unsubscribeFromAuth = subscribeToAuth(async (newUserData) => {
             this.authUser = newUserData;        // Actualiza los datos del usuario autenticado
@@ -277,16 +292,19 @@
                 @upload-cover="handleUploadCover"
             />
 
+            <OrderDropdown v-model="orderBy" :categories="categoryOptions" class="mb-4" />
+
             <div class="w-[100%]">
                 <div class="p-4 w-[95vw] m-auto">
                     <ul v-if="!loadingPosts" class="masonry-gallery">
-                        <li v-for="post in posts" :key="post.id" class="item">
+                        <li v-for="post in filteredPosts" :key="post.id" class="item">
 
                             <PostItem
                                 :post="post"
                                 :category-styles="categoryStyles"
                                 :comments-count="comments[post.id] ? comments[post.id].length : 0"
                                 :current-user-id="authUser.id"
+                                :following-list="authUser.following || []"
                                 @go-to-post="goToPost"
                                 @toggle-like="toggleLike"
                                 @toggle-dislike="toggleDislike"
@@ -296,7 +314,7 @@
                             
                         </li>
                     </ul>
-                    <div v-else class="flex justify-center">
+                    <div v-else class="flex justify-center mt-40">
                         <Loader />
                     </div>
                 </div>
@@ -683,12 +701,6 @@
         .masonry-gallery {
             columns: 4; 
         }
-    }
-
-
-    .create-post{
-        padding: 0 10%;
-        margin-bottom: 5rem;
     }
 
 

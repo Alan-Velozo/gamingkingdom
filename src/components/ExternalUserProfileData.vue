@@ -2,6 +2,7 @@
     import TextWithDefault from './TextWithDefault.vue';
     import { getUserCommunities } from '../services/community';
     import { isFollowing, followUser, unfollowUser, getFollowersCount, getFollowingCount } from '../services/user-profile';
+    import { refreshAuthUser } from '../services/auth';
 
     export default {
         name: 'ExternalUserProfileData',
@@ -60,11 +61,16 @@
                     await unfollowUser(this.authUser.id, this.user.id);
                     this.isFollowingUser = false;
                     this.followersCount--;
+                    // Actualiza el array localmente
+                    if (this.authUser.following) {
+                        this.authUser.following = this.authUser.following.filter(id => id !== this.user.id);
+                    }
                 } else {
                     await followUser(this.authUser.id, this.user.id);
                     this.isFollowingUser = true;
                     this.followersCount++;
                 }
+                await refreshAuthUser(); // Fuerza la recarga global del usuario autenticado
                 this.loadingFollow = false;
             }
         }
@@ -111,7 +117,7 @@
                         {{ isFollowingUser ? 'Dejar de seguir' : 'Seguir' }}
                     </button>
                 </div>
-                <div class="flex justify-between mt-10">
+                <div class="followers-following flex justify-between mt-10">
                     <span><b>{{ followersCount }}</b> seguidores</span>
                     <span><b>{{ followingCount }}</b> seguidos</span>
                 </div>
@@ -220,10 +226,24 @@
             padding: 0 5%;
         }
 
+        .user-data button, .user-cta a{
+            max-width: 300px;
+        }
+
+        .followers-following{
+            justify-content: space-evenly;
+        }
+
         .user-cta{
             display: flex;
             justify-content: center;
             padding-top: 2rem;
+        }
+    }
+
+    @media screen and (max-width: 400px) {
+        .followers-following{
+            justify-content: space-between;
         }
     }
 </style>

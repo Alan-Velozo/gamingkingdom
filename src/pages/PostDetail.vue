@@ -262,15 +262,25 @@
         <router-link :to="post.user_id === authUser.id ? '/perfil' : `/usuario/${post.user_id}`">
           <div class="post-info">
             <img :src="post.photoURL" alt="Post imagen" v-if="post.photoURL" />
-            <p class="post-username">{{ post.displayName }}</p>
+            <p class="post-username">
+              {{ post.displayName }}
+              <span v-if="authUser && authUser.following && authUser.following.includes(post.user_id)" class="ml-10 align-middle">
+                <router-link :to="`/usuario/${post.user_id}`" @click.stop>
+                  <i class="fa-solid fa-user-check" title="Sigues a este usuario"></i>
+                </router-link>
+              </span>
+            </p>
             <p v-if="post.created_at !== null" class="post-date">
               {{ formatDate(post.created_at.toDate()) }}
             </p>
           </div>
         </router-link>
 
-        <img v-if="isImage" :src="post.cover" class="m-auto pb-10" @error="onImageError"/>
-        <video v-else :src="post.cover" class="m-auto pb-10" controls></video>
+        <div class="post-cover">
+          <img v-if="isImage" :src="post.cover" class="m-auto pb-10" @error="onImageError"/>
+          <video v-else :src="post.cover" class="m-auto pb-10" controls></video>
+          <h1>{{ post.title }}</h1>
+        </div>
         
         <div v-html="post.content" class="post-content"></div>
 
@@ -380,9 +390,17 @@
     overflow: hidden;
   }
 
+  h1{
+    text-align: center;
+    font-weight: bold;
+    padding-bottom: 2rem;
+    font-size: 2rem;
+  }
+
   .post img, .post video{
     max-height: 80vh;
     object-fit: contain;
+    width: 100%;
   }
 
   ::v-deep .post-content img {
@@ -541,6 +559,12 @@
     .post-info .post-date, .comment-date{
       margin-left: auto;
       font-size: 1rem;
+    }
+  }
+
+  @media screen and (max-width: 550px) {
+    h1{
+      font-size: 1.5rem;
     }
   }
 

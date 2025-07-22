@@ -27,6 +27,10 @@
         type: Boolean,
         default: false,
       },
+      followingList: {
+        type: Array,
+        default: () => []
+      },
     },
     data() {
       return {
@@ -94,6 +98,11 @@
           <i :class="['fa', categoryStyles[post.category.toLowerCase()].icon]"></i>
           {{ post.category === 'Guia' ? 'Guía' : post.category }}
         </span>
+        <!-- <span v-if="followingList && followingList.includes(post.user_id)" class="mr-auto pl-5">
+          <router-link :to="`/usuario/${post.user_id}`" @click.stop>
+            <i class="fa-solid fa-user-check" title="Sigues a este usuario"></i>
+          </router-link>
+        </span> -->
         <span v-if="post.created_at" class="post-date">
           {{ formatDate(post.created_at.toDate()) }}
         </span>
@@ -101,6 +110,13 @@
 
       <!-- Título del post -->
       <p class="post-title" @click="goToPost">{{ post.title }}</p>
+
+      <span v-if="followingList && followingList.includes(post.user_id)" class="flex pt-4 pl-5 font-normal">
+        <router-link :to="`/usuario/${post.user_id}`" @click.stop>
+          <i class="fa-solid fa-user-check pr-2" title="Sigues a este usuario"></i>
+          {{ post.displayName }}
+        </router-link>
+      </span>
 
       <!-- Acciones: like, dislike y comentarios -->
       <div class="post-actions flex">

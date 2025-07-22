@@ -6,10 +6,11 @@
   import PostForm from '../../components/PostForm.vue'; 
   import Loader from "../../components/Loader.vue"; 
   import PostItem from '../../components/PostItem.vue'; 
+  import OrderDropdown from '../../components/OrderDropdown.vue';
 
   export default {
     name: "Community", 
-    components: { PostForm, Loader, PostItem }, 
+    components: { PostForm, Loader, PostItem, OrderDropdown }, 
     data() {
       return {
         community: null, // Datos de la comunidad
@@ -25,6 +26,7 @@
         loadingPosts: true, // Indica si las publicaciones están cargando
         comments: {}, // Comentarios de las publicaciones (organizados por ID de publicación)
         savedPosts: [], // Lista de publicaciones guardadas por el usuario
+        orderBy: 'todos',
       };
     },
     computed: {
@@ -35,6 +37,15 @@
       // Devuelve los estilos de las categorías (colores e íconos)
       categoryStyles() {
         return categoryStyles;
+      },
+      categoryOptions() {
+        const cats = this.posts.map(p => (p.category || '').toLowerCase().trim()).filter(Boolean);
+        return [...new Set(cats)].map(cat => cat.charAt(0).toUpperCase() + cat.slice(1)).sort();
+      },
+      filteredPosts() {
+        if (this.orderBy === 'todos') return this.posts;
+        if (this.orderBy === 'seguidos') return this.posts.filter(post => this.authUser.following && this.authUser.following.includes(post.user_id));
+        return this.posts.filter(post => (post.category || '').toLowerCase().trim() === this.orderBy.toLowerCase().trim());
       },
     },
     methods: {
@@ -249,16 +260,20 @@
         @upload-cover="handleUploadCover"
       />
 
+      <!-- Antes del listado de publicaciones -->
+      <OrderDropdown v-model="orderBy" :categories="categoryOptions" class="mb-4" />
+
       <!-- Listado de publicaciones -->
       <section class="w-[100%]">
         <div class="p-4 w-[95vw] m-auto pb-20">
           <ul v-if="!loadingPosts" class="masonry-gallery">
-            <li v-for="post in posts" :key="post.id" class="item">       
+            <li v-for="post in filteredPosts" :key="post.id" class="item">       
               <PostItem
                 :post="post"
                 :category-styles="categoryStyles"
                 :comments-count="comments[post.id] ? comments[post.id].length : 0"
                 :current-user-id="authUser.id"
+                :following-list="authUser.following || []"
                 @go-to-post="goToPost"
                 @toggle-like="toggleLike"
                 @toggle-dislike="toggleDislike"
@@ -277,7 +292,7 @@
   </div>
 </template>
   
-<style>
+<style scoped>
   /* .community-container {
     text-align: center;
   } */
@@ -340,7 +355,7 @@
   .cta{
     margin-left:auto;
     display: flex;
-    padding-top: 50px;
+    padding-top: 100px;
   }
   
   .join-button, .chat-button, .leave-button {
@@ -481,11 +496,10 @@
       margin: auto;
       padding-top: 0;
     }
-  }
 
-  .create-post{
-    padding: 0 10%;
-    margin: 5rem 0;
+    .community-description{
+      max-width: 90%;
+    }
   }
 
 </style>

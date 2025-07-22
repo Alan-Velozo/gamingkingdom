@@ -238,6 +238,7 @@
                                     :category-styles="categoryStyles"
                                     :comments-count="comments[post.id] ? comments[post.id].length : 0"
                                     :current-user-id="authUser.id"
+                                    :following-list="authUser.following || []"
                                     @go-to-post="goToPost"
                                     @toggle-like="toggleLike"
                                     @toggle-dislike="toggleDislike"
@@ -263,6 +264,7 @@
                                     :category-styles="categoryStyles"
                                     :comments-count="comments[post.id] ? comments[post.id].length : 0"
                                     :current-user-id="authUser.id"
+                                    :following-list="authUser.following || []"
                                     :isPostSaved="savedPosts.some(saved => saved.id === post.id)"
 
                                     @go-to-post="goToPost"
@@ -310,6 +312,21 @@
         list-style-type: none; /* Elimina el estilo predeterminado de listas */
         padding: 0;
         margin: 0;
+    }
+
+    .item {
+        padding: 0;
+        margin-bottom: 50px; 
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        break-inside: avoid; 
+        word-wrap: break-word; 
+        word-break: break-word; 
+        overflow-wrap: break-word; 
+        hyphens: auto;
+        background: white;
+        border: 2px solid black;
+        border-radius: 0px;
+        cursor: pointer;
     }
 
     .item:hover{

@@ -62,7 +62,7 @@
                     </li>
                 </ul>
 
-                <div class="flex justify-between mt-4">
+                <div class="followers-following flex justify-between mt-4">
                     <span><b>{{ followersCount }}</b> seguidores</span>
                     <span><b>{{ followingCount }}</b> seguidos</span>
                 </div>
@@ -201,8 +201,22 @@
             margin: auto;
         }
 
+        .followers-following{
+            justify-content: space-evenly;
+        }
+
         .user-cta .create-community{
             margin-top: 1rem;
+        }
+
+        .user-data button, .user-cta a{
+            max-width: 300px;
+        }
+    }
+
+    @media screen and (max-width: 400px) {
+        .followers-following{
+            justify-content: space-between;
         }
     }
 

@@ -228,6 +228,12 @@
         border: 2px dashed black;
     }
 
+    .create-post{
+      max-width: 95vw;
+      padding: 5rem 1rem;
+      margin: auto;
+    }
+
     #category{
         margin: 2rem 0;
     }
@@ -248,12 +254,6 @@
 
         .post-thumbnail-form .post-title-form{
             padding-bottom: 2.5rem;
-        }
-    }
-
-    @media screen and (max-width: 900px){
-        .create-post{
-            padding: 0 5%;
         }
     }
 </style>

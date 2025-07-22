@@ -2,6 +2,7 @@
   import { subscribeToAuth } from '../services/auth';
   import { getPrivateChats } from '../services/private-chat';
   import { getUserCommunities } from '../services/community';
+  import { getUsersByIds } from '../services/user-profile';
   import CircleLoader from './CircleLoader.vue';
 
   export default {
@@ -15,7 +16,24 @@
         collapsed: false,
         loading: true,
         unsubscribeFromAuth: () => {},
+        followingUsers: [], // Usuarios a los que sigo
       };
+    },
+    computed: {
+      uniqueChatUsers() {
+        // Usuarios de chats privados (pueden tener estructura diferente)
+        const chatUsers = this.privateChats.map(chat => chat.participants[0]);
+        // Usuarios seguidos
+        const following = this.followingUsers;
+        // Unifica y elimina duplicados por ID
+        const all = [...chatUsers, ...following];
+        const unique = {};
+        all.forEach(user => {
+          if (user && user.id) unique[user.id] = user;
+        });
+        // Devuelve un array de usuarios únicos
+        return Object.values(unique);
+      }
     },
     methods: {
       async fetchChats() {
@@ -25,6 +43,13 @@
         try {
           this.privateChats = await getPrivateChats(this.userId);
           this.communities = await getUserCommunities(this.userId);
+          // Obtener usuarios seguidos
+          const user = JSON.parse(localStorage.getItem('user'));
+          if (user && user.following && user.following.length > 0) {
+            this.followingUsers = await getUsersByIds(user.following);
+          } else {
+            this.followingUsers = [];
+          }
           this.loading = false;
         } catch (error) {
           console.error('Error cargando chats:', error);
@@ -77,23 +102,17 @@
       </div>
 
       <template v-else>
-        <div v-if="privateChats.length === 0 && communities.length === 0" class="empty-message">
+        <div v-if="uniqueChatUsers.length === 0 && communities.length === 0" class="empty-message">
           <p>Tu bandeja de entrada está vacía.</p>
         </div>
         
         <template v-else>
-          <div>
+          <div v-if="uniqueChatUsers.length > 0">
             <ul>
-              <li 
-                v-for="chat in privateChats" 
-                :key="chat.chatId"
-                class="chat-item"
-              >
-                <router-link
-                  :to="`/chat/usuario/${chat.participants[0]?.id}`"
-                  class="chat-link"
-                >
-                  {{ chat.participants[0]?.displayName || 'Usuario' }}
+              <li v-for="user in uniqueChatUsers" :key="user.id" class="chat-item">
+                <router-link :to="`/chat/usuario/${user.id}`" class="chat-link">
+                  <img v-if="user.photoURL" :src="user.photoURL" class="inline-block w-8 h-8 rounded-full mr-2"/>
+                  {{ user.displayName || 'Usuario' }}
                 </router-link>
               </li>
             </ul>
