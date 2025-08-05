@@ -1,0 +1,9 @@
+NOMBRE Y APELLIDO: Alan Velozo
+CARRERA: Tecnicatura en diseño y programación web
+MATERIA: Clientes Web Mobile
+AÑO: 2025
+TURNO: Noche
+COMISIÓN: DWN4AV
+CUATRIMESTRE: 4to
+DOCENTE: Santiago Gallino
+CARÁCTER DE ENTREGA: Final

@@ -25,7 +25,7 @@
             posts: [],                  // Lista de publicaciones
             loadingPosts: true,         // Indica si las publicaciones están cargando
             comments: {},               // Comentarios de las publicaciones (organizados por ID de publicación)
-            newCommentContent: {},      // Contenido de nuevos comentarios (no se usa en este código)
+            commentUnsubscribers: [],
             savedPosts: [],             // Lista de publicaciones guardadas por el usuario
             userCommunities: [],        // Lista de comunidades a las que pertenece el usuario
             orderBy: 'todos',
@@ -42,10 +42,7 @@
             return categoryStyles;
         },
         categoryOptions() {
-            // Devuelve las categorías únicas, normalizadas y capitalizadas para mostrar
-            const cats = this.posts.map(p => (p.category || '').toLowerCase().trim()).filter(Boolean);
-            // Capitaliza la primera letra para mostrar bonito
-            return [...new Set(cats)].map(cat => cat.charAt(0).toUpperCase() + cat.slice(1)).sort();
+            return categories
         },
         filteredPosts() {
             if (this.orderBy === 'todos') return this.posts;
@@ -190,7 +187,9 @@
                             if (!this.comments[post.id]) {
                                 this.comments[post.id] = [];
                             }
-                            this.subscribeToPostComments(post.id);
+                            const unsubscribe = this.subscribeToPostComments(post.id);
+                            this.commentUnsubscribers.push(unsubscribe);
+
                         });
                     });
                 } catch (error) {
@@ -204,13 +203,10 @@
 
     // Cancela las suscripciones al desmontar el componente
     unmounted() {
+        // Cancela las suscripciones para evitar fugas de memoria
         if (this.unsubscribeFromAuth) this.unsubscribeFromAuth();
         if (this.unsubscribeFromPosts) this.unsubscribeFromPosts();
-        Object.keys(this.comments).forEach(postId => {
-            if (this.comments[postId].unsubscribe) {
-                this.comments[postId].unsubscribe();
-            }
-        });
+        this.commentUnsubscribers.forEach(fn => fn && fn());
     }};
 </script>
 
@@ -385,7 +381,7 @@
     .banner .banner-content .banner-1 .banner-cta .register-cta{
         padding: 1rem 2rem;
         color: white;
-        border-radius: 100px;
+        border-radius: 50px;
     }
 
     .banner .banner-content .banner-1 .banner-cta .login-cta a,
@@ -400,9 +396,9 @@
 
     .banner .banner-content .banner-1 .banner-cta .login-cta:hover{
         background: #9b2024;
-        transition-property: background, border;
+        transition-property: background, border-radius;
         transition-duration: .5s;
-        border: 1px solid black;
+        border-radius: 100px;
     }
 
     .banner .banner-content .banner-1 .banner-cta .register-cta{
@@ -413,9 +409,9 @@
     
     .banner .banner-content .banner-1 .banner-cta .register-cta:hover{
         background: #0a5f9c;
-        transition-property: background, border;
+        transition-property: background, border-radius;
         transition-duration: .5s;
-        border: 1px solid black;
+        border-radius: 100px;
     }
 
     @media screen and (max-width: 1340px) {

@@ -54,7 +54,7 @@
         goToResult(result) {
             if (result.type === 'community') {
                 // Si el resultado es una comunidad, redirige a la página de la comunidad
-                this.$router.push(`/community/${result.id}`);
+                this.$router.push(`/comunidad/${result.id}`);
             } else if (result.type === 'user') {
                 // Si el resultado es un usuario, redirige a la página del usuario
                 this.$router.push(`/usuario/${result.id}`);
@@ -290,7 +290,6 @@
 
   .login, .signup {
     padding: 8px 20px;
-    border-radius: 20px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s;
@@ -300,21 +299,16 @@
     background: transparent;
     border: 1px solid white;
     color: white;
+    border-radius: 100px;
   }
 
   .signup {
     background: white;
     border: none;
-  }
-
-  .login:hover {
-    background: rgba(255, 255, 255, 0.1);
+    border-radius: 100px;
   }
 
   @media (max-width: 1000px) {
-    /* .search-container {
-      display: none;
-    } */
     
     .nav-links {
       gap: 15px;

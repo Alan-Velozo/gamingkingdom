@@ -26,7 +26,7 @@
                 comments: {}, // Comentarios organizados por ID de publicación
                 newCommentContent: {}, // Contenido de nuevos comentarios
                 unsubscribeFromAuth: () => {}, // Función para cancelar suscripción de autenticación
-                unsubscribeComments: () => {}, // Función para cancelar suscripción de comentarios
+                commentUnsubscribers: [],
                 savedPosts: [], // Lista de publicaciones guardadas por el usuario autenticado
                 isFollowingUser: false, // Si el usuario autenticado sigue a este perfil
                 followersCount: 0,
@@ -47,7 +47,6 @@
                 return categoryStyles;
             },
         },
-        // Hook del ciclo de vida: se ejecuta cuando el componente se monta en el DOM
         async mounted() {
             this.userLoaded = false;
 
@@ -81,25 +80,14 @@
 
                 // Suscribirse a los comentarios de cada publicación
                 newPosts.forEach(post => {
-                    if (!this.unsubscribeComments[post.id]) {
-                        this.unsubscribeComments[post.id] = this.subscribeToPostComments(post.id);
+                    if (!this.comments[post.id]) {
+                        this.comments[post.id] = [];
                     }
+                    this.subscribeToPostComments(post.id);
                 });
+
             });
         },
-
-        // Hook del ciclo de vida: se ejecuta antes de que el componente se desmonte del DOM
-        beforeUnmount() {
-            // Cancela las suscripciones para evitar fugas de memoria
-            if (this.unsubscribeFromPosts) this.unsubscribeFromPosts();
-            if (this.unsubscribeFromAuth) this.unsubscribeFromAuth();
-            
-            // Desuscribirse de los comentarios de cada publicación
-            Object.values(this.unsubscribeComments).forEach(unsub => {
-                if (typeof unsub === "function") unsub();
-            });
-        },
-
         methods: {
             // Formatea una fecha a formato local
             formatDate(date) {
@@ -115,12 +103,10 @@
 
             // Se suscribe a los comentarios de una publicación específica
             subscribeToPostComments(postId) {
-                if (!this.comments[postId]) {
-                    this.comments[postId] = [];
-                }
-                return subscribeToComments(postId, newComments => {
+                const unsub = subscribeToComments(postId, newComments => {
                     this.comments[postId] = newComments;
                 });
+                this.commentUnsubscribers.push(unsub);
             },
 
             // Alterna el estado de guardado de una publicación
@@ -204,7 +190,13 @@
                     this.isFollowingUser = true;
                     this.followersCount++;
                 }
-            },
+            }
+        },
+        beforeUnmount() {
+            // Cancela las suscripciones para evitar fugas de memoria
+            if (this.unsubscribeFromPosts) this.unsubscribeFromPosts();
+            if (this.unsubscribeFromAuth) this.unsubscribeFromAuth();
+            this.commentUnsubscribers.forEach(fn => fn && fn());
         }
     }
 </script>

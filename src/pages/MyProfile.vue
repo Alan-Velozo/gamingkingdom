@@ -30,7 +30,7 @@
                 activeTab: 'my-activity', // Pestaña activa (mi actividad o guardados)
                 unsubscribeFromAuth: () => {}, // Función para cancelar suscripción de autenticación
                 unsubscribePosts: () => {}, // Función para cancelar suscripción de posts
-                unsubscribeComments: () => {} // Función para cancelar suscripción de comentarios
+                commentUnsubscribers: [],
             }
         },
         computed: {
@@ -50,9 +50,7 @@
             savedPosts() {
                 return this.posts.filter(post => this.savedPostIds.includes(post.id));
             },
-        },
-        
-        // Hook del ciclo de vida: se ejecuta cuando el componente se monta en el DOM
+        },   
         async mounted() {
             // Suscribe el componente a los cambios en la autenticación del usuario
             this.unsubscribeFromAuth = subscribeToAuth(async (newUserData) => {
@@ -85,15 +83,13 @@
                 });
             });
         },
-        
-        // Hook del ciclo de vida: se ejecuta antes de que el componente se desmonte del DOM
         unmounted() {
             // Cancela las suscripciones para evitar fugas de memoria
             this.unsubscribeFromAuth();
             this.unsubscribePosts(); // Asegurarse de desuscribirse de los posts
 
             // Cancela las suscripciones de comentarios de cada publicación
-            Object.values(this.unsubscribeComments).forEach(unsub => unsub());
+            this.commentUnsubscribers.forEach(fn => fn && fn());
         },
         
         methods: {
@@ -114,10 +110,15 @@
                 if (!this.comments[postId]) {
                     this.comments[postId] = [];
                 }
-                return subscribeToComments(postId, newComments => {
+
+                const unsubscribe = subscribeToComments(postId, newComments => {
                     this.comments[postId] = newComments;
                 });
+
+                // ✅ guardá la función de desuscripción
+                this.commentUnsubscribers.push(unsubscribe);
             },
+
 
             // Alterna el "like" de una publicación
             async toggleLike(postId) {

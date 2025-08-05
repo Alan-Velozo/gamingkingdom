@@ -4,7 +4,6 @@
   import MainButton from "../components/MainButton.vue";
   import { categories, categoryStyles } from "../services/post";
 
-
   export default {
       name: 'Home',
       components: { MainButton },
@@ -14,7 +13,7 @@
         type: String,
         default: null,
       },
-      // Datos iniciales para el formulario (puedes pasarlos para prellenar o dejar los valores por defecto)
+      // Datos iniciales para el formulario
       initialPostData: {
         type: Object,
         default: () => ({
@@ -54,7 +53,6 @@
         const maxSize = 20971520;
         if (file.size > maxSize) {
           this.coverError = "El archivo es demasiado pesado";
-          // Puedes limpiar el input si lo deseas:
           event.target.value = "";
           return;
         } else {
@@ -87,9 +85,6 @@
         // Emite el evento "create-post" con los datos del post
         this.$emit("create-post", this.postData);
 
-
-
-
         this.postData = { ...this.initialPostData };
         // 2. Limpia el contenido del editor
         this.editor.root.innerHTML = "";
@@ -114,48 +109,44 @@
       this.editor.on("text-change", () => {
         this.postData.content = this.editor.root.innerHTML;
       });
-    },
+    }
   };
 </script>
 
-
-
 <template>
     <div>
-            <form @submit.prevent="handleSubmit" class="create-post">
+      <form @submit.prevent="handleSubmit" class="create-post">
                     
-                <div class="post-thumbnail-form">
-                        <div class="post-title-form">
-                            <label for="title" class="font-bold">Título</label>
-                            <input v-model="postData.title" type="text" placeholder="Escoge un título interesante para tu publicación" required id="title" maxlength="60"/>
-                        </div>
-                        <div class="post-cover-form">
-                            
-                            <input type="file" @change="handleCoverUpload" accept="image/*,video/*" id="cover" class="file-input"/>
-                            <label for="cover" class="file-label">
-                              <div>
-                                <i class="fa-solid fa-file-image"></i>
-                                <span v-if="isUploading">Cargando...</span>
-                                <span v-else-if="coverFileName">{{ coverFileName }}</span>
-                                <span v-else>Portada</span>
-                              </div>
-                              <p v-if="coverError" class="error-text">{{ coverError }}</p>
-                            </label>
+        <div class="post-thumbnail-form">
+            <div class="post-title-form">
+                <label for="title" class="font-bold">Título</label>
+                <input v-model="postData.title" type="text" placeholder="Escoge un título interesante para tu publicación" required id="title" maxlength="60"/>
+            </div>
+            <div class="post-cover-form">                    
+                <input type="file" @change="handleCoverUpload" accept="image/*,video/*" id="cover" class="file-input"/>
+                <label for="cover" class="file-label">
+                  <div>
+                    <i class="fa-solid fa-file-image"></i>
+                    <span v-if="isUploading">Cargando...</span>
+                    <span v-else-if="coverFileName">{{ coverFileName }}</span>
+                    <span v-else>Portada</span>
+                  </div>
+                  <p v-if="coverError" class="error-text">{{ coverError }}</p>
+                </label>
+            </div>
+        </div>
 
-                        </div>
-                </div>
+        <div ref="editor" class="quill-editor"></div>
 
-                <div ref="editor" class="quill-editor"></div>
+        <label for="category">Categoría: </label>
+        <select v-model="postData.category" id="category">
+            <option v-for="cat in categoryList" :key="cat" :value="cat">
+                {{ cat === "Guia" ? "Guía" : cat }}
+            </option>
+        </select>
 
-                <label for="category">Categoría: </label>
-                <select v-model="postData.category" id="category">
-                        <option v-for="cat in categoryList" :key="cat" :value="cat">
-                            {{ cat === "Guia" ? "Guía" : cat }}
-                        </option>
-                </select>
-
-                <MainButton>Publicar</MainButton>
-            </form>
+        <MainButton>Publicar</MainButton>
+      </form>
     </div>
 </template>
 
@@ -185,12 +176,12 @@
     }
 
     .file-label{
-      display: flex;
-      flex-direction: column;
+        display: flex;
+        flex-direction: column;
     }
     .error-text{
-      color: #DE1B1B;
-      padding-top: .5rem;
+        color: #DE1B1B;
+        padding-top: .5rem;
     }
 
     .quill-editor {
@@ -229,9 +220,9 @@
     }
 
     .create-post{
-      max-width: 95vw;
-      padding: 5rem 1rem;
-      margin: auto;
+        max-width: 95vw;
+        padding: 5rem 1rem;
+        margin: auto;
     }
 
     #category{

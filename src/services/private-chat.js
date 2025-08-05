@@ -60,33 +60,61 @@ async function createOrVerifyPrivateChat(senderId, receiverId) {
 
 // Calcular el ID del chat basado en los IDs de los participantes
 function calculateChatId(id1, id2) {
-    return [id1, id2].sort().join('_');         // Ordena los IDs y los une con un guion bajo
-
+    return [id1, id2].sort().join('_');         // Ordena los IDs y los une con un guión bajo
 }
 
+/**
+ * Obtiene todos los chats privados de un usuario con información de los participantes
+ * @param {string} userId - ID del usuario cuyos chats se quieren obtener
+ * @returns {Promise<Array>} - Array de objetos con información de los chats
+ */
 export async function getPrivateChats(userId) {
+    // Referencia a la colección de chats privados
     const chatsRef = collection(db, "private-chats");
+    
+    // Consulta para obtener solo los chats donde el usuario es participante
+    // La consulta where(userId, "==", true) busca documentos donde el campo con nombre igual al userId tenga valor true
     const q = query(chatsRef, where(userId, "==", true));
+    
+    // Ejecuta la consulta y obtiene los resultados
     const querySnapshot = await getDocs(q);
 
+    // Array para almacenar la información procesada de los chats
     const chats = [];
+    
+    // Itera sobre cada documento (chat) encontrado
     for (const doc of querySnapshot.docs) {
+        // Obtiene el ID del chat desde el documento
         const chatId = doc.id;
+        
+        // Extrae los IDs de todos los participantes excepto el usuario actual
+        // Object.keys(doc.data()) obtiene todas las claves del objeto, que son los IDs de los participantes
+        // filter(key => key !== userId) elimina el ID del usuario actual
         const participants = Object.keys(doc.data()).filter(key => key !== userId);
 
-        // Obtener el displayName de cada participante
+        // Obtiene información detallada de cada participante usando sus perfiles
+        // Promise.all permite ejecutar múltiples promesas en paralelo y esperar a que todas se completen
         const participantProfiles = await Promise.all(
             participants.map(async (participantId) => {
+                // Obtiene el perfil completo del participante usando la función importada
                 const profile = await getUserProfileById(participantId);
+                
+                // Retorna un objeto con información básica del participante
                 return {
                     id: participantId,
-                    displayName: profile.displayName || participantId, // Usar el ID como fallback
+                    // Usa el displayName del perfil o el ID como respaldo si no hay nombre
+                    displayName: profile.displayName || participantId,
                 };
             })
         );
 
-        chats.push({ chatId, participants: participantProfiles });
+        // Añade la información del chat al array de resultados
+        chats.push({ 
+            chatId,                             // ID único del chat 
+            participants: participantProfiles   // Array con información de los participantes
+        });
     }
 
+    // Retorna el array con todos los chats procesados
     return chats;
 }

@@ -20,7 +20,6 @@ const routes = [
     { path: '/',                        component: Home, },
     { path: '/iniciar-sesion',          component: Login, },
     { path: '/registro',                component: Register, },
-    // { path: '/chat',                    component: Chat,                meta: { requiresAuth: true } },
     {
         path: '/chat',
         component: ChatLayout,
@@ -31,7 +30,7 @@ const routes = [
             component: PrivateChat
           },
           {
-            path: 'community/:id',
+            path: 'comunidad/:id',
             component: CommunityChat
           },
         ]
@@ -40,11 +39,9 @@ const routes = [
     { path: '/perfil',                  component: MyProfile,           meta: { requiresAuth: true } },
     { path: '/perfil/editar',           component: MyProfileEdit,       meta: { requiresAuth: true } },
     { path: '/usuario/:id',             component: UserProfile,         meta: { requiresAuth: true } },
-    // { path: '/usuario/:id/chat',        component: PrivateChat,         meta: { requiresAuth: true, hideFooter: true } },
     { path: '/post/:id',                component: PostDetail,          meta: { requiresAuth: true } }, 
-    { path: '/community/:id',           component: Community,           meta: { requiresAuth: true } },
-    { path: '/create-community',        component: CreateCommunity,     meta: { requiresAuth: true } },
-    // { path: '/community/:id/chat',      component: CommunityChat,       meta: { requiresAuth: true, hideFooter: true } },
+    { path: '/comunidad/:id',           component: Community,           meta: { requiresAuth: true } },
+    { path: '/crear-comunidad',         component: CreateCommunity,     meta: { requiresAuth: true } },
 
 
 ];
@@ -64,10 +61,6 @@ let authUser = {
 subscribeToAuth(newUserData => authUser = newUserData);
 
 router.beforeEach((to, from) => {
-    // console.log('[router] Navegando a la ruta... ', to.path);
-    // Para acceder al chat, el usuario debe estar autenticado.
-    // if(authUser.id === null && to.path == '/chat') {
-    // if(authUser.id === null && ['/chat', '/perfil', '...'].includes(to.path)) {
     if(authUser.id === null && to.meta.requiresAuth) {
         return {
             path: '/iniciar-sesion',

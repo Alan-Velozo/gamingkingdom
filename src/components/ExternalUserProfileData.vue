@@ -44,33 +44,49 @@
                 }
                 this.loadingCommunities = false;
             }
-            // Lógica de seguidores/seguidos
+
+            // Verifica si el usuario autenticado está siguiendo a este perfil
             if (this.authUser && this.authUser.id && this.user.id && this.authUser.id !== this.user.id) {
                 this.isFollowingUser = await isFollowing(this.authUser.id, this.user.id);
             }
+
+            // Obtiene los contadores de seguidores y seguidos del usuario
             if (this.user.id) {
                 this.followersCount = await getFollowersCount(this.user.id);
                 this.followingCount = await getFollowingCount(this.user.id);
             }
         },
         methods: {
+            /**
+            * Alterna el estado de "seguir" o "dejar de seguir" a un usuario
+            */
             async toggleFollow() {
+
+                // Verifica que haya un usuario autenticado válido y que no sea el mismo perfil
                 if (!this.authUser || !this.authUser.id || !this.user.id || this.authUser.id === this.user.id) return;
+                
                 this.loadingFollow = true;
+                
+                
                 if (this.isFollowingUser) {
+                    // Si ya sigue al usuario, deja de seguir
                     await unfollowUser(this.authUser.id, this.user.id);
                     this.isFollowingUser = false;
                     this.followersCount--;
-                    // Actualiza el array localmente
+
+                    // Actualiza el array local del usuario autenticado
                     if (this.authUser.following) {
                         this.authUser.following = this.authUser.following.filter(id => id !== this.user.id);
                     }
                 } else {
+                    // Si no lo sigue, comienza a seguirlo
                     await followUser(this.authUser.id, this.user.id);
                     this.isFollowingUser = true;
                     this.followersCount++;
                 }
-                await refreshAuthUser(); // Fuerza la recarga global del usuario autenticado
+
+                // Actualiza globalmente los datos del usuario autenticado en la app
+                await refreshAuthUser(); 
                 this.loadingFollow = false;
             }
         }
@@ -101,7 +117,7 @@
                     <p><i class="fa-solid fa-people-group"></i> Comunidades</p>
                     <ul>
                         <li v-for="community in communities" :key="community.id">
-                            <router-link :to="`/community/${community.id}`">{{ community.name }}</router-link>
+                            <router-link :to="`/comunidad/${community.id}`">{{ community.name }}</router-link>
                         </li>
                     </ul>
                 </div>

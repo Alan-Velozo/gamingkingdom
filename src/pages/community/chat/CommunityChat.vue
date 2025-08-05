@@ -69,8 +69,6 @@
         }).format(date).replace(',', '');
       },
     },
-
-    // Hook del ciclo de vida: se ejecuta cuando el componente se monta en el DOM
     mounted() {
       // Suscripción a mensajes del chat (actualización en tiempo real)
       this.unsubscribeFromMessages = subscribeToCommunityChatMessages(this.communityId, newMessages => {
@@ -123,8 +121,6 @@
           console.error("Error al obtener la comunidad:", error);
         });
     },
-
-    // Hook del ciclo de vida: se ejecuta antes de que el componente se desmonte del DOM
     unmounted() {
       // Limpieza al desmontar el componente
       if (this.unsubscribeFromMessages) this.unsubscribeFromMessages(); // Cancela la suscripción a mensajes
@@ -139,7 +135,7 @@
     <!-- Nombre de la comunidad -->
     <div class="chat-header">
         <span v-if="!loadingMessages">
-          <router-link :to="`/community/${communityId}`">
+          <router-link :to="`/comunidad/${communityId}`">
             <img
               :src="community.photoURL"
               alt="Foto de la comunidad"

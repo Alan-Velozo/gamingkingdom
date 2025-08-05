@@ -101,7 +101,7 @@
                     }
 
                     // Redirige a la página de la comunidad creada
-                    this.$router.push(`/community/${communityId}`);
+                    this.$router.push(`/comunidad/${communityId}`);
                 } catch (error) {
                     console.error("Error al crear la comunidad:", error);
                 } finally {
@@ -262,9 +262,9 @@
         padding: 10px 0;
         color: white;
         font-family: "Jersey 15", sans-serif;
-        font-size: 2.5rem;
+        font-size: 2rem;
         margin-top: 50px;
-        width: 45%;
+        width: 200px;
     }
 
     form button:hover{
@@ -340,6 +340,10 @@
 
         form div div:first-of-type{
             margin-top: 0;
+        }
+
+        form button{
+            width: 100%;
         }
     }
 

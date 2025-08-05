@@ -3,9 +3,9 @@ import { db } from "./firebase";
 
 export async function getUserProfileById(id) {
     try {
-        const refUser = doc(db, `users/${id}`); // Referencia al documento del usuario en Firestore
+        const refUser = doc(db, `users/${id}`); 
 
-        const userDoc = await getDoc(refUser); // Obtiene el documento del usuario
+        const userDoc = await getDoc(refUser); 
 
         // Retornar los datos del perfil de usuario
         return {
@@ -26,15 +26,15 @@ export async function getUserProfileById(id) {
 }
 
 export async function createUserProfile(id, data) {
-    const refUser = doc(db, `users/${id}`); // Referencia al documento del usuario en Firestore
+    const refUser = doc(db, `users/${id}`); 
 
-    await setDoc(refUser, data); // Crea el documento del usuario con los datos proporcionados
+    await setDoc(refUser, data); 
 }
 
 export async function updateUserProfile(id, data) {
-    const refUser = doc(db, `users/${id}`); // Referencia al documento del usuario en Firestore
+    const refUser = doc(db, `users/${id}`); 
 
-    await updateDoc(refUser, data); // Actualiza el documento del usuario con los datos proporcionados
+    await updateDoc(refUser, data); 
 }
 
 // Seguir a un usuario

@@ -98,11 +98,7 @@
           <i :class="['fa', categoryStyles[post.category.toLowerCase()].icon]"></i>
           {{ post.category === 'Guia' ? 'Guía' : post.category }}
         </span>
-        <!-- <span v-if="followingList && followingList.includes(post.user_id)" class="mr-auto pl-5">
-          <router-link :to="`/usuario/${post.user_id}`" @click.stop>
-            <i class="fa-solid fa-user-check" title="Sigues a este usuario"></i>
-          </router-link>
-        </span> -->
+    
         <span v-if="post.created_at" class="post-date">
           {{ formatDate(post.created_at.toDate()) }}
         </span>

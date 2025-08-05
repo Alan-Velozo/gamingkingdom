@@ -17,7 +17,7 @@
                 loadingUser: true,
                 unsubscribeFromAuth: () => {},
 
-                messages: [],           // Almacena los mensajes del chat
+                messages: [],                               // Almacena los mensajes del chat
                 unsubscribeFromMessages: () => {},          // Función para desuscribirse de mensajes
 
                 // Nuevo mensaje a enviar

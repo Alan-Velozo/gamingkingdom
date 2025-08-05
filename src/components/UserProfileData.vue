@@ -26,7 +26,7 @@
             if (this.user.id) {
                 this.loadingCommunities = true;
                 try {
-                    // Obtener las comunidades del usuario
+                    // Obtener las comunidades, seguidores y seguidos del usuario
                     this.communities = await getUserCommunities(this.user.id);
                     this.followersCount = await getFollowersCount(this.user.id);
                     this.followingCount = await getFollowingCount(this.user.id);
@@ -35,7 +35,7 @@
                 }
                 this.loadingCommunities = false;
             }
-        },
+        }
     }
 </script>
 
@@ -71,14 +71,14 @@
                     <p><i class="fa-solid fa-people-group"></i> Comunidades</p>
                     <ul>
                         <li v-for="community in communities" :key="community.id">
-                            <router-link :to="`/community/${community.id}`">{{ community.name }}</router-link>
+                            <router-link :to="`/comunidad/${community.id}`">{{ community.name }}</router-link>
                         </li>
                     </ul>
                 </div>
                 
                 <div class="user-cta">
                     <router-link class="edit-profile" to="/perfil/editar"><i class="fa-solid fa-user-pen" style="color: #ffffff;"></i> Editar perfil</router-link>
-                    <router-link class="create-community" to="/create-community"><i class="fa-solid fa-plus" style="color: #ffffff;"></i> Crear comunidad</router-link>
+                    <router-link class="create-community" to="/crear-comunidad"><i class="fa-solid fa-plus" style="color: #ffffff;"></i> Crear comunidad</router-link>
                 </div>
             </div>
 

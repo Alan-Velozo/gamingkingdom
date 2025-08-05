@@ -1,6 +1,6 @@
 <script>
     import MainButton from '../components/MainButton.vue';
-    import { subscribeToAuth, updateUser, updateUserPhoto, updateUserBanner, updateUserFavoriteGame } from '../services/auth';
+    import { subscribeToAuth, updateUser, updateUserPhoto, updateUserBanner } from '../services/auth';
 
     export default {
         name: 'MyProfileEdit',
@@ -156,9 +156,7 @@
                 this.favoriteGameSearch = game.name; // Completa el campo de búsqueda
             }
             
-        },
-        
-        // Hook del ciclo de vida: se ejecuta cuando el componente se monta en el DOM
+        }, 
         mounted() {
             // Suscribe el componente a los cambios en la autenticación del usuario
             this.unsubscribeFromAuth = subscribeToAuth(newUserData => {
@@ -168,9 +166,7 @@
                 this.photoPreview = this.authUser.photoURL || '/assets/users/user.png';
                 this.bannerPreview = this.authUser.bannerURL || '/assets/users/banner.png'
             });
-        },
-        
-        // Hook del ciclo de vida: se ejecuta antes de que el componente se desmonte del DOM
+        },  
         unmounted() {
             // Desuscribirse de los cambios de autenticación cuando el componente se desmonta
             this.unsubscribeFromAuth();
@@ -222,10 +218,6 @@
                         <p v-if="photoSizeError" class="error-text">{{ photoSizeError }}</p>
                         <img v-if="photoPreview != null" :src="photoPreview" alt="" class="photo-preview pb-10">
                     </label>
-
-                    <!-- <div>
-                        <img v-if="photoPreview != null" :src="photoPreview" alt="" class="photo-preview">
-                    </div> -->
                 </div>
 
                 <div>
@@ -240,10 +232,6 @@
                         <p v-if="bannerSizeError" class="error-text">{{ bannerSizeError }}</p>
                         <img v-if="bannerPreview != null" :src="bannerPreview" alt="" class="banner-preview pb-10">
                     </label>
-
-                    <!-- <div>
-                        <img v-if="bannerPreview != null" :src="bannerPreview" alt="" class="banner-preview">
-                    </div> -->
                 </div>
             </div>
 
@@ -268,8 +256,6 @@
                     {{ editingProfile ? 'Cargando...' : 'Editar' }}
                 </button>
             </div>
-
-    
         </form>
     </div>
 </template> 
@@ -325,7 +311,7 @@
         text-align: center;
         width: fit-content;
         margin-top: 2rem;
-
+        max-height: 450px;
     }
 
     form input, textarea{
@@ -350,15 +336,16 @@
         background: #0d76bc;
         padding: 10px 0;
         color: white;
-        width: 45%;
+        width: 200px;
         font-family: "Jersey 15", sans-serif;
-        font-size: 2.5rem;
-        margin-top: 50px;
+        font-size: 2rem;
+        margin-top: 75px;
+        height: fit-content;
     }
 
     form button:hover{
         background: #0b6bac;
-        border: 2px solid black;
+        border: 1px solid black;
         transition-property: background, border;
         transition-duration: .25s
     }
@@ -391,6 +378,14 @@
         form div div:first-of-type{
             margin-top: 0;
         }
+
+        .file-label{
+            height: fit-content;
+        }
+
+        form button{
+            width: 100%;
+        }
     }
 
     .file-label{
@@ -405,6 +400,7 @@
         justify-content: center;
         align-items: center;
         font-size: 1.25rem;
+        height: 550px;
     }
 
     .file-label:hover{

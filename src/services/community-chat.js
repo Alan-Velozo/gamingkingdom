@@ -1,15 +1,8 @@
-import { 
-    addDoc, 
-    collection, 
-    onSnapshot, 
-    orderBy, 
-    query, 
-    serverTimestamp 
-  } from "firebase/firestore";
-  import { db } from "./firebase";
+import { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp } from "firebase/firestore";
+import { db } from "./firebase";
   
-  // Guarda un mensaje en el chat de la comunidad
-  export function saveCommunityChatMessage(communityId, data) {
+// Guarda un mensaje en el chat de la comunidad
+export function saveCommunityChatMessage(communityId, data) {
     // Referencia a la subcolección "chat" dentro de la comunidad específica
     const chatRef = collection(db, `communities/${communityId}/chat`);
     
@@ -18,10 +11,10 @@ import {
       ...data, // Desestructura los datos recibidos (por ejemplo: user_id, email, content)
       created_at: serverTimestamp(), // Agrega la marca de tiempo del servidor
     }).then(doc => ({ id: doc.id })); // Devuelve el id del mensaje recién creado
-  }
+}
   
-  // Se suscribe a los mensajes del chat de una comunidad, ordenados por fecha
-  export function subscribeToCommunityChatMessages(communityId, callback) {
+// Se suscribe a los mensajes del chat de una comunidad, ordenados por fecha
+export function subscribeToCommunityChatMessages(communityId, callback) {
     // Referencia a la subcolección "chat" dentro de la comunidad específica
     const chatRef = collection(db, `communities/${communityId}/chat`);
     
@@ -39,5 +32,5 @@ import {
       // Llama al callback proporcionado con la lista de mensajes actualizada
       callback(messages);
     });
-  }
+}
   

@@ -10,57 +10,81 @@
     components: { CircleLoader },
     data() {
       return {
-        privateChats: [],
-        communities: [],
+        privateChats: [],                  // Lista de chats privados del usuario logueado
+        communities: [],                   // Lista de comunidades a las que pertenece el usuario 
         userId: null,
-        collapsed: false,
+        collapsed: false,                  // Estado de visibilidad del sidebar (colapsado o expandido)
         loading: true,
         unsubscribeFromAuth: () => {},
-        followingUsers: [], // Usuarios a los que sigo
+        followingUsers: [],                // Usuarios a los que el usuario actual sigue
       };
     },
     computed: {
+      /**
+       * Combina usuarios de chats privados y usuarios seguidos en una sola lista
+       * Elimina duplicados usando el ID del usuario
+       */
       uniqueChatUsers() {
-        // Usuarios de chats privados (pueden tener estructura diferente)
+        // Obtiene el primer participante de cada chat (el otro usuario del chat)
         const chatUsers = this.privateChats.map(chat => chat.participants[0]);
-        // Usuarios seguidos
+
+        // Obtiene los usuarios a los que el usuario sigue
         const following = this.followingUsers;
-        // Unifica y elimina duplicados por ID
+
+        // Combina ambos arrays
         const all = [...chatUsers, ...following];
+
+        // Elimina duplicados creando un objeto con key = user.id
         const unique = {};
         all.forEach(user => {
           if (user && user.id) unique[user.id] = user;
         });
+
         // Devuelve un array de usuarios únicos
         return Object.values(unique);
       }
     },
     methods: {
+      /**
+      * Obtiene los chats privados, comunidades y usuarios seguidos del usuario logueado
+      */
       async fetchChats() {
-        if (!this.userId) return;
+        if (!this.userId) return;                       // Si no hay usuario logueado, no hacemos nada
         this.loading = true;
 
         try {
+          // Carga todos los chats privados del usuario desde el servicio
           this.privateChats = await getPrivateChats(this.userId);
+
+          // Carga todas las comunidades en las que el usuario está
           this.communities = await getUserCommunities(this.userId);
-          // Obtener usuarios seguidos
+
+          // Carga usuarios seguidos desde localStorage (datos guardados del usuario autenticado)
           const user = JSON.parse(localStorage.getItem('user'));
+          
           if (user && user.following && user.following.length > 0) {
             this.followingUsers = await getUsersByIds(user.following);
           } else {
             this.followingUsers = [];
           }
-          this.loading = false;
+
+          this.loading = false;                         // Termina la carga
         } catch (error) {
           console.error('Error cargando chats:', error);
           this.loading = false;
         }
       },
+
+      /**
+       * Alterna la visibilidad del sidebar en pantallas móviles
+       */
       toggleSidebar() {
+
         this.collapsed = !this.collapsed;
 
         const chatContent = document.querySelector('.chat-content');
 
+        // Comportamiento diferente en pantallas pequeñas (<700px)
         if (window.innerWidth < 700) {
           if (this.collapsed) {
             // Si el sidebar está colapsado, mostrar el chat
@@ -75,6 +99,12 @@
         }
       },
     },
+
+    /**
+    * Cuando el componente se monta:
+    * - Nos suscribimos al estado de autenticación para obtener el userId en tiempo real.
+    * - Cargamos los chats cuando el usuario está autenticado.
+    */
     mounted() {
       this.unsubscribeFromAuth = subscribeToAuth((userData) => {
         this.userId = userData?.id;
@@ -126,7 +156,7 @@
                 class="chat-item"
               >
                 <router-link 
-                  :to="`/chat/community/${community.id}`"
+                  :to="`/chat/comunidad/${community.id}`"
                   class="chat-link"
                 >
                   <i class="fa-solid fa-users"></i> {{ community.name }}

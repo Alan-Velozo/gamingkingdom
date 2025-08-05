@@ -26,6 +26,7 @@
         loadingPosts: true, // Indica si las publicaciones están cargando
         comments: {}, // Comentarios de las publicaciones (organizados por ID de publicación)
         savedPosts: [], // Lista de publicaciones guardadas por el usuario
+        commentUnsubscribers: [], // Funciones de suscripción a los comentarios (para cancelar)
         orderBy: 'todos',
       };
     },
@@ -169,7 +170,6 @@
         });
       },
     },
-    // Hook del ciclo de vida: se ejecuta cuando el componente se monta en el DOM
     async mounted() {
       // Obtiene el ID de la comunidad desde los parámetros de la ruta
       const communityId = this.$route.params.id;
@@ -205,21 +205,16 @@
           if (!this.comments[post.id]) {
             this.comments[post.id] = [];
           }
-          this.subscribeToPostComments(post.id);
+          const unsubscribe = this.subscribeToPostComments(post.id);
+          this.commentUnsubscribers.push(unsubscribe);
         });
       });
     },
-    // Hook del ciclo de vida: se ejecuta antes de que el componente se desmonte del DOM
     beforeUnmount() {
       // Cancela las suscripciones para evitar fugas de memoria
       if (this.unsubscribeFromAuth) this.unsubscribeFromAuth();
       if (this.unsubscribeFromPosts) this.unsubscribeFromPosts();
-      // Cancela las suscripciones de comentarios de cada publicación
-      Object.keys(this.comments).forEach(postId => {
-        if (this.comments[postId].unsubscribe) {
-          this.comments[postId].unsubscribe();
-        }
-      });
+      this.commentUnsubscribers.forEach(fn => fn && fn());
     },
   };
 </script>
@@ -245,7 +240,7 @@
           {{ isMember ? '- Salir' : '+ Unirme' }}
         </button>
 
-        <router-link :to="`/chat/community/${community.id}`" class="chat-button"><i class="fa-solid fa-comments" style="color: #ffffff;"></i> Chat</router-link>
+        <router-link :to="`/chat/comunidad/${community.id}`" class="chat-button"><i class="fa-solid fa-comments" style="color: #ffffff;"></i> Chat</router-link>
       </div>
     </div>
     <p class="community-description">{{ community.description }}</p>

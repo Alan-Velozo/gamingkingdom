@@ -28,7 +28,7 @@
       class="text-gray-800 font-semibold py-2 px-2"
     >
       <option value="todos">Todos</option>
-      <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+      <option v-for="cat in categories" :key="cat" :value="cat">{{ cat === "Guia" ? "Guía" : cat }}</option>
       <option value="seguidos">Seguidos</option>
     </select>
   </div>

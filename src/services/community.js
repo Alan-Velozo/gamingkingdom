@@ -1,6 +1,4 @@
-import { 
-    getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, getDoc 
-} from "firebase/firestore";
+import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, getDoc } from "firebase/firestore";
 import { getFileURL, uploadFile } from "./file-storage";
 import { getExtensionFromFile } from "../libraries/file";
 import { db } from "./firebase";
@@ -11,7 +9,7 @@ const communitiesRef = collection(db, "communities");
 // Función para crear una nueva comunidad
 export async function createCommunity({ name, description }) {
     try {
-        // 1️- Crea la comunidad en Firestore sin imágenes
+        // Crea la comunidad en Firestore sin imágenes
         const newCommunity = { name, description, photoURL: "", bannerURL: "" };
 
         // Agrega un nuevo documento a la colección "communities"

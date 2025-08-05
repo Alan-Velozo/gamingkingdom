@@ -66,7 +66,6 @@
           return this.newMessage.content.trim() === '';
         }
       },
-      // Hook del ciclo de vida: se ejecuta cuando el componente se monta en el DOM
       async mounted() {
           // Obtiene los datos del usuario con quien se está chateando
           getUserProfileById(this.$route.params.id).then((user) => {
@@ -83,7 +82,6 @@
               this.loadingMessages = false;
           });
       },
-      // Hook del ciclo de vida: se ejecuta antes de que el componente se desmonte del DOM
       unmounted() {
           // Cancela las suscripciones para evitar fugas de memoria
           this.unsubscribeFromAuth();

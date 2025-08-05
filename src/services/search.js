@@ -76,7 +76,7 @@ export async function search(searchQuery, userId) {
     } catch (error) {
 
         // En caso de error, imprimir el error en la consola y retornar un array vacío
-        console.error("Error en la búsqueda unificada:", error);
+        console.error("Error en la búsqueda:", error);
         return []; // En caso de error, retorna un array vacío
     }
 }

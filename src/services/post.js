@@ -1,14 +1,4 @@
-import { 
-    addDoc, 
-    collection, 
-    onSnapshot, 
-    orderBy, 
-    query, 
-    updateDoc,
-    serverTimestamp, 
-    doc as firestoreDoc, 
-    getDoc 
-} from "firebase/firestore"; 
+import { addDoc, collection, onSnapshot, orderBy, query, updateDoc,serverTimestamp, doc as firestoreDoc, getDoc } from "firebase/firestore"; 
 import { db } from "./firebase";
 
 // Define las categorías disponibles para las publicaciones - Array de strings para validación de tipos de contenido
@@ -128,7 +118,6 @@ export const saveComment = (postId, comment) => {
     }
 
     // Agrega un nuevo documento a la subcolección 'comments' del post
-    // La estructura es: posts/{postId}/comments/{commentId}
     return addDoc(collection(db, `posts/${postId}/comments`), {
         user_id: comment.user_id,
         email: comment.email,

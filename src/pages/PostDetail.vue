@@ -1,10 +1,7 @@
 <script>
-  import { subscribeToPosts, subscribeToComments, saveComment, getLikesAndDislikes, toggleReaction, toggleCommentReaction, toggleSavePost, getSavedPosts } from '../services/post'; // Funciones necesarias
-  import { subscribeToAuth } from '../services/auth'; // Para obtener el usuario autenticado
-  import { ref, onMounted, onBeforeUnmount } from 'vue'; // Reactividad y ciclos de vida
+  import { subscribeToPosts, subscribeToComments, saveComment, getLikesAndDislikes, toggleReaction, toggleCommentReaction, toggleSavePost, getSavedPosts } from '../services/post'; 
+  import { subscribeToAuth } from '../services/auth'; 
   import Loader from "../components/Loader.vue";
-
-  // Importa el editor de texto enriquecido Quill
   import Quill from 'quill';
   import 'quill/dist/quill.snow.css';
 
@@ -186,8 +183,6 @@
         return strippedContent === '';
       }
     },
-    
-    // Hook del ciclo de vida: se ejecuta cuando el componente se monta en el DOM
     mounted() {
       // Suscribir al usuario autenticado
       this.unsubscribeAuth = subscribeToAuth((newUserData) => {
@@ -239,8 +234,6 @@
         }
       });
     },
-    
-    // Hook del ciclo de vida: se ejecuta antes de que el componente se desmonte del DOM
     beforeUnmount() {
       // Limpiar las suscripciones para evitar fugas de memoria
       if (this.unsubscribeAuth) this.unsubscribeAuth();
