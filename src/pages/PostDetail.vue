@@ -208,7 +208,6 @@
                       ['link'],
                   ],
               clipboard: {
-                // Opcional: eliminar formatos al pegar
                 matchVisual: false,
               },
             },

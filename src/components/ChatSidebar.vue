@@ -160,7 +160,7 @@
                   :to="`/chat/comunidad/${community.id}`"
                   class="chat-link"
                 >
-                  <i class="fa-solid fa-users"></i> {{ community.name }}
+                  <i class="fa-solid fa-users pr-5"></i> {{ community.name }}
                 </router-link>
               </li>
             </ul>
