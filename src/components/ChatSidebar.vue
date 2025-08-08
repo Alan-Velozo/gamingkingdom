@@ -36,6 +36,7 @@
 
         // Elimina duplicados creando un objeto con key = user.id
         const unique = {};
+        
         all.forEach(user => {
           if (user && user.id) unique[user.id] = user;
         });

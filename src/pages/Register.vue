@@ -179,7 +179,6 @@
         background: none;
     }
 
-
     .login-container .login-form form .email{
         padding: 3rem 0;
     }
@@ -191,6 +190,7 @@
         cursor: pointer;
         background: black;
         border: 1px solid black;
+        border-radius: 100px;
         font-size: 1.1rem;
         margin-top: 3rem;
     }

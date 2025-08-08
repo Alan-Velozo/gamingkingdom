@@ -11,12 +11,12 @@ export function saveChatMessage(data) {
         ...data, // Desestructura los datos recibidos (por ejemplo: user_id, email, content)
         created_at: serverTimestamp(), // Agrega la marca de tiempo del servidor
     })
-        .then(doc => {
-            // Devuelve el id del documento recién creado
-            return {
-                id: doc.id,
-            }
-        });
+    .then(doc => {
+        // Devuelve el id del documento recién creado
+        return {
+            id: doc.id,
+        }
+    });
 }
 
 // Se suscribe en tiempo real a los mensajes de la colección 'chat'

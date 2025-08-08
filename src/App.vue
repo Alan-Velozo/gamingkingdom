@@ -290,7 +290,7 @@
 
   .login, .signup {
     padding: 8px 20px;
-    font-weight: bold;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
   }

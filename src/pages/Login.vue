@@ -24,7 +24,7 @@
                         path: '/perfil',
                     });
                 } catch (error) {
-                    this.error = 'Credenciales incorrectas. Por favor, inténtelo de nuevo.';
+                    this.error = 'Credenciales incorrectas. Inténtalo de nuevo.';
                     console.error('[Login handleSubmit] ', error)
                 }
                 this.loading = false;
@@ -153,7 +153,6 @@
         padding: .5rem;
     }
 
-
     .login-container .login-form form .password{
         padding: 3rem 0;
     }
@@ -166,6 +165,7 @@
         background: black;
         border: 1px solid black;
         font-size: 1.1rem;
+        border-radius: 100px;
     }
 
     @media screen and (max-width: 1279px) {

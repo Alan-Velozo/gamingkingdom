@@ -64,7 +64,6 @@
             // Guarda la publicación en Firestore
             savePost(postData)
                 .then(() => {
-                // Opcional: mostrar mensaje o reiniciar el formulario
                 })
                 .catch((error) => console.error("Error al crear post:", error));
         },
@@ -391,27 +390,13 @@
     }
 
     .banner .banner-content .banner-1 .banner-cta .login-cta{
-        background: #C0282E;
-    }
-
-    .banner .banner-content .banner-1 .banner-cta .login-cta:hover{
-        background: #9b2024;
-        transition-property: background, border-radius;
-        transition-duration: .5s;
-        border-radius: 100px;
+        background: black;
     }
 
     .banner .banner-content .banner-1 .banner-cta .register-cta{
-        background: #0d71b8;
         margin-left: 1.5rem;
-    }
-
-    
-    .banner .banner-content .banner-1 .banner-cta .register-cta:hover{
-        background: #0a5f9c;
-        transition-property: background, border-radius;
-        transition-duration: .5s;
-        border-radius: 100px;
+        color: black;
+        border: 2px solid black;
     }
 
     @media screen and (max-width: 1340px) {
@@ -468,7 +453,6 @@
 
 
         .banner .banner-content .banner-1 .banner-cta .register-cta{
-            background: #0d71b8;
             margin-left: 0;
             margin-top: 1rem;
         }
